@@ -1,0 +1,432 @@
+## REMEMBER TO SWITCH TO 15 processes/parallel in sbatch -narray for CPF (0-19 for NA)
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 1 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 2 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 3 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 4 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 5 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 6 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 7 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 8 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 9 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 10 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 11 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 12 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 13 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 14 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 15 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 16 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 17 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 18 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 19 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 20 30s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 1 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 2 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 3 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 4 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 5 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 6 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 7 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 8 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 9 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 10 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 11 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 12 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 13 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 14 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 15 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 16 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 17 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 18 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 19 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 20 15s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 1 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 2 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 3 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 4 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 5 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 6 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 7 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 8 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 9 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 10 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 11 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 12 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 13 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 14 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 15 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 16 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 17 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 18 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 19 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 20 10s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 1 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 2 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 3 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 4 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 5 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 6 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 7 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 8 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 9 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 10 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 11 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 12 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 13 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 14 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 15 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 16 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 17 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 18 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 19 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 20 5s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 1 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 2 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 3 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 4 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 5 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 6 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 7 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 8 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 9 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 10 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 11 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 12 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 13 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 14 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 15 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 16 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 17 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 18 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 19 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh CPF 20 1s
+
+===
+PASTE HERE JOBIDS FOR CPF PO 
+
+
+
+
+
+=============================================================== NA
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 30s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 30s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 15s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 15s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 10s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 10s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 5s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 5s
+
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 1s
+sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 1s
+
+
+===========================
+STARTED with NA only
+
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 30s
+Submitted batch job 903039
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 30s
+Submitted batch job 903059
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 30s
+Submitted batch job 903060
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 30s
+Submitted batch job 903061
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 30s
+Submitted batch job 903062
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 30s
+Submitted batch job 903063
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 30s
+Submitted batch job 903064
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 30s
+Submitted batch job 903065
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 30s
+Submitted batch job 903066
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 30s
+Submitted batch job 903067
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 30s
+Submitted batch job 903068
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 30s
+Submitted batch job 903069
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 30s
+Submitted batch job 903070
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 30s
+Submitted batch job 903071
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 30s
+Submitted batch job 903072
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 30s
+Submitted batch job 903073
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 30s
+Submitted batch job 903074
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 30s
+Submitted batch job 903075
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 30s
+Submitted batch job 903076
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 30s
+Submitted batch job 903077
+
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 15s
+Submitted batch job 903392
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 15s
+Submitted batch job 903393
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 15s
+Submitted batch job 903394
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 15s
+Submitted batch job 903395
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 15s
+Submitted batch job 903396
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 15s
+Submitted batch job 903397
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 15s
+Submitted batch job 903398
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 15s
+Submitted batch job 903399
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 15s
+Submitted batch job 903400
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 15s
+Submitted batch job 903401
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 15s
+Submitted batch job 903402
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 15s
+Submitted batch job 903403
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 15s
+Submitted batch job 903404
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 15s
+Submitted batch job 903405
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 15s
+Submitted batch job 903406
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 15s
+Submitted batch job 903407
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 15s
+Submitted batch job 903408
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 15s
+Submitted batch job 903409
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 15s
+Submitted batch job 903410
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 15s
+Submitted batch job 903411
+
+
+
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 10s
+Submitted batch job 903412
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 10s
+Submitted batch job 903413
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 10s
+Submitted batch job 903414
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 10s
+Submitted batch job 903415
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 10s
+Submitted batch job 903416
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 10s
+Submitted batch job 903417
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 10s
+Submitted batch job 903418
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 10s
+Submitted batch job 903419
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 10s
+Submitted batch job 903420
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 10s
+Submitted batch job 903421
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 10s
+Submitted batch job 903422
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 10s
+Submitted batch job 903423
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 10s
+Submitted batch job 903424
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 10s
+Submitted batch job 903425
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 10s
+Submitted batch job 903426
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 10s
+Submitted batch job 903427
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 10s
+Submitted batch job 903428
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 10s
+Submitted batch job 903429
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 10s
+Submitted batch job 903430
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 10s
+Submitted batch job 903431
+
+
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 5s
+Submitted batch job 903432
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 5s
+Submitted batch job 903433
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 5s
+Submitted batch job 903434
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 5s
+Submitted batch job 903435
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 5s
+Submitted batch job 903436
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 5s
+Submitted batch job 903437
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 5s
+Submitted batch job 903438
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 5s
+Submitted batch job 903439
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 5s
+Submitted batch job 903440
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 5s
+Submitted batch job 903441
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 5s
+Submitted batch job 903442
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 5s
+Submitted batch job 903443
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 5s
+Submitted batch job 903444
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 5s
+Submitted batch job 903445
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 5s
+Submitted batch job 903446
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 5s
+Submitted batch job 903447
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 5s
+Submitted batch job 903448
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 5s
+Submitted batch job 903449
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 5s
+Submitted batch job 903450
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 5s
+Submitted batch job 903451
+
+
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 1 1s
+Submitted batch job 903452
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 2 1s
+Submitted batch job 903453
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 3 1s
+Submitted batch job 903454
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 4 1s
+Submitted batch job 903455
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 5 1s
+Submitted batch job 903456
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 6 1s
+Submitted batch job 903457
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 7 1s
+Submitted batch job 903458
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 8 1s
+Submitted batch job 903459
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 9 1s
+Submitted batch job 903460
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 10 1s
+Submitted batch job 903461
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 11 1s
+Submitted batch job 903462
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 12 1s
+Submitted batch job 903463
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 13 1s
+Submitted batch job 903464
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 14 1s
+Submitted batch job 903465
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 15 1s
+Submitted batch job 903466
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 16 1s
+Submitted batch job 903467
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 17 1s
+Submitted batch job 903468
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 18 1s
+Submitted batch job 903469
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 19 1s
+Submitted batch job 903470
+[asuarezcet@login ~]$sbatch $MOA_DEV/experiments/scripts/NA_seeds_PO_triggering_slurm_SPY_SEEDS.sh NA_1 20 1s
+Submitted batch job 903471
