@@ -5,4 +5,7 @@ It also contains the ADDM drift detector, which consists of two embedded ADWIN c
 
 Older versions of GroCH as referred as 'NA'/'NA.java' in the scripts.
 
-Use MOA version 2017.06 and Java SE 7.
+**Dependencies:** 
+
+- MOA version 2017.06
+- Java SE 7.
