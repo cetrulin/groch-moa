@@ -4,3 +4,5 @@ This repository contains the implementation of GroCH, iGNGSVM and RCARF, and scr
 It also contains the ADDM drift detector, which consists of two embedded ADWIN confidence intervals under the same detector. One to signal warnings and another for concept drifts.
 
 Older versions of GroCH as referred as 'NA'/'NA.java' in the scripts.
+
+Use MOA version 2017.06 and Java SE 7.
