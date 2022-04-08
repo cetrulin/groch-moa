@@ -12,7 +12,7 @@ Older versions of GroCH as referred as 'NA'/'NA.java' in the scripts.
 
 In order to the algorithms contained by the folder `src`, the following versions of Java and Massive Online Analysis (MOA) are needed.
 
-- [MOA version 2017.06](https://sourceforge.net/projects/moa-datastream/files/MOA/2017%20June/moa-release-2017.06b.zip/download) (download developer version with src code: [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/))
+- [MOA version 2017.06](https://sourceforge.net/projects/moa-datastream/files/MOA/2017%20June/moa-release-2017.06b.zip/download) (us the developer version with src code: [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/))
 - Java SE 7.
 
 The folder `experiments` contains bash scripts to run a similar parameter optimisation and experiments than the ones performed in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance**. 
