@@ -1,6 +1,9 @@
 # GroCH - MOA Implementation
 
-This repository contains the implementation of GroCH, iGNGSVM and RCARF, and scripts to run parameter-tuning for the MOA implementation GroCH in an HPC cluster using SLURM. The original implementation of iGNGSVM from the paper [*An online classification algorithm for large scale data streams: **iGNGSVM***](https://www.sciencedirect.com/science/article/pii/S0925231217309852?casa_token=1quuIWzSuV8AAAAA:z9vWMavVc4hIiCSeazenq4kWSowtocF7hMYUd3uy-eprEEYiMiw__QXJbkm2lDmUguk127hAjw) can be found in the repository [Data-Streams-Online-Classification-WEKA-MOA-Algorithms](https://github.com/cetrulin/Data-Streams-Online-Classification-WEKA-MOA-Algorithms).
+This repository contains the implementation of GroCH, iGNGSVM and RCARF, and scripts to run parameter-tuning for the MOA implementation GroCH in an HPC cluster using SLURM. 
+
+- The original implementation of iGNGSVM from the paper [*An online classification algorithm for large scale data streams: **iGNGSVM***](https://www.sciencedirect.com/science/article/pii/S0925231217309852?casa_token=1quuIWzSuV8AAAAA:z9vWMavVc4hIiCSeazenq4kWSowtocF7hMYUd3uy-eprEEYiMiw__QXJbkm2lDmUguk127hAjw) can be found in the repository [Data-Streams-Online-Classification-WEKA-MOA-Algorithms](https://github.com/cetrulin/Data-Streams-Online-Classification-WEKA-MOA-Algorithms).
+- Extra implementation and variants of the RCARF algorithm, mentioned in the appendix of the thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance**, can be found in the repo [RCARF](https://github.com/cetrulin/RCARF).
 
 It also contains the ADDM drift detector, which consists of two embedded ADWIN confidence intervals under the same detector. One to signal warnings and another for concept drifts.
 
