@@ -2447,7 +2447,11 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		}
 
 		public NABaseLearner copyConcept(int key) {
-			NABaseLearner aux = this.groupList.get(key).getBaseLearner();
+			NABaseLearner orig = this.groupList.get(key).getBaseLearner();
+			NABaseLearner aux = new NABaseLearner(orig.indexOriginal, orig.classifier.copy(),
+					(BasicClassificationPerformanceEvaluator) orig.evaluator.copy(), orig.createdOn, orig.useDriftDetector,
+					orig.isBackgroundLearner, orig.useRecurringLearner, orig.isOldLearner,
+					orig.windowProperties != null ? orig.windowProperties.copy() : null, null, orig.timesUsed, orig.cumInstTrained);
 			return aux;
 		}
 
