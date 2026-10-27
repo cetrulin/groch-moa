@@ -3,7 +3,7 @@ package moa.classifiers.igngsvm.gng;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class GUnit {
+public class GUnit implements Cloneable {
 	public double w[];
 	private int label;	
 	private double errorAccum;
@@ -14,6 +14,18 @@ public class GUnit {
 		this.w = w.clone();
 		this.label = label;
 		this.errorAccum = 0;
+	}
+
+	public GUnit(GUnit other){
+		this.w = (other.w != null) ? other.w.clone() : null;
+		this.label = other.label;
+		this.errorAccum = other.errorAccum;
+		this.neighbors = new ArrayList<GEdge>();
+	}
+
+	@Override
+	public GUnit clone(){
+		return new GUnit(this);
 	}
 	
 	public void setError(double error){

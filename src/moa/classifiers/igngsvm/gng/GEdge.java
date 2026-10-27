@@ -10,6 +10,12 @@ public class GEdge {
 		this.p1 = p1;
 		this.age = 0;
 	}
+
+	public GEdge(GUnit p0, GUnit p1, int age){
+		this.p0 = p0;
+		this.p1 = p1;
+		this.age = age;
+	}
 	
 	@Override
 	public int hashCode() {

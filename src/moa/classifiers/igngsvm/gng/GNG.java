@@ -425,14 +425,65 @@ public class GNG extends AbstractClusterer implements Cloneable {
 	@SuppressWarnings("unchecked")
 	@Override
 	public GNG clone() {
-	    try {
-    		GNG cloned = (GNG) super.clone();
-    		cloned.id = (int) (Math.random() * 1000);
-    		cloned.S = (ArrayList<GUnit>) cloned.S.clone();
+		try {
+			GNG cloned = (GNG) super.clone();
+			cloned.id = (int) (Math.random() * 1000);
+
+			if (this.S != null) {
+				java.util.IdentityHashMap<GUnit, GUnit> unitMap = new java.util.IdentityHashMap<GUnit, GUnit>();
+				ArrayList<GUnit> newS = new ArrayList<GUnit>(this.S.size());
+				for (GUnit u : this.S) {
+					GUnit newU = new GUnit(u);
+					unitMap.put(u, newU);
+					newS.add(newU);
+				}
+
+				java.util.IdentityHashMap<GEdge, GEdge> edgeMap = new java.util.IdentityHashMap<GEdge, GEdge>();
+				for (GUnit oldU : this.S) {
+					if (oldU.neighbors != null) {
+						for (GEdge oldEdge : oldU.neighbors) {
+							if (!edgeMap.containsKey(oldEdge)) {
+								GUnit newP0 = unitMap.get(oldEdge.p0);
+								GUnit newP1 = unitMap.get(oldEdge.p1);
+								if (newP0 != null && newP1 != null) {
+									GEdge newEdge = new GEdge(newP0, newP1, oldEdge.age);
+									edgeMap.put(oldEdge, newEdge);
+								}
+							}
+						}
+					}
+				}
+
+				for (GUnit oldU : this.S) {
+					GUnit newU = unitMap.get(oldU);
+					if (oldU.neighbors != null && newU != null) {
+						for (GEdge oldEdge : oldU.neighbors) {
+							GEdge newEdge = edgeMap.get(oldEdge);
+							if (newEdge != null) {
+								newU.neighbors.add(newEdge);
+							}
+						}
+					}
+				}
+				cloned.S = newS;
+			}
+
+			if (this.receivedPatterns != null) {
+				cloned.receivedPatterns = new ArrayList<double[]>(this.receivedPatterns.size());
+				for (double[] pat : this.receivedPatterns) {
+					cloned.receivedPatterns.add(pat != null ? pat.clone() : null);
+				}
+			}
+
+			if (this.auxInst != null) {
+				cloned.auxInst = (Instance) this.auxInst.copy();
+			}
+
 			return cloned;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
-		} return null;
+		}
+		return null;
 	}
 
 

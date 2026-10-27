@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -533,7 +534,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 
 	@Override
     protected Measurement[] getModelMeasurementsImpl() {
-        List<Measurement> measurementList = new ArrayList<Measurement>();
+        List<Measurement> measurementList = new LinkedList<Measurement>();
         measurementList.add(new Measurement("Change detected", this.numberOfDriftsDetected));
         measurementList.add(new Measurement("Warning detected", this.numberOfWarningsDetected));
         // TODO. add all columns from logEvents object, to remove this object
