@@ -3,9 +3,8 @@
 WEKALOC=${MOA_DEV}/weka
 MOALOC=${MOA_DEV}/moa
 JAVAAGENT=${MOA_DEV}/sizeofag-1.0.0.jar
-#EXTRAPATH="./lib/colt.jar:../moaAlgorithms/classes:../wekaAlgorithms/classes:../weka-3-7-4/lib/libsvm.jar:/home/alex/src/gpsc/bin"
-#EXTRAPATH="./lib/colt.jar:../moaAlgorithms/classes:../wekaAlgorithms/classes:../weka-3-7-4/lib/libsvm.jar:../gpsc/bin:../RCARF-master/bin"
-EXTRAPATH="${MOA_DEV}/lib/*":"${MOA_DEV}/moa_classes/classifiers"
+export JDK_JAVA_OPTIONS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.ref=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED"
+EXTRAPATH="${MOA_DEV}:${MOA_DEV}/moa.jar:${MOA_DEV}/lib/*"
 RESULTPATH=${RESULTS_PATH}
 DATAPATH=${DATA_PATH}"/real"
 
@@ -13,7 +12,7 @@ DATAPATH=${DATA_PATH}"/real"
 PROBLEMS=$3
 DATASET=$4
 mahalanobis_init_set=$5
-MAX_INSTANCES=1000000
+MAX_INSTANCES=${MAX_INSTANCES:-1000000}
 
 SEED="1"
 WSIZE=1000 # 10 #500
@@ -425,7 +424,7 @@ for PROBLEM in $PROBLEMS; do
   NA_groupMaxSizes="5"
   NA_feature_subset_indexes1="1,3,12,15,16,17"
   NA_feature_subset_indexes2="0,1,3,5,6,12,15,16,17"
-  NA_RDDM_confidences="1.8 2.0 2.2 2.258"
+  NA_RDDM_confidences="2.0"
   NA_baseClassifier=${HT}
   echo ${HT}
   # groupReplacementPolicy="" not now
@@ -437,10 +436,10 @@ for PROBLEM in $PROBLEMS; do
 
     NA_distanceThresh=$2
     gng_maxAge=$6
-    NA_driftDet=$(echo $7 | sed "s/'/ /g")
-    trainOnWarn=$(echo $8 | sed "s/'/ /g")
-    trainEND=$(echo $9 | sed "s/'/ /g")
-    preTrain=$(echo ${10} | sed "s/'/ /g")
+    NA_driftDet=$(printf "%s" "$7" | sed "s/'/ /g")
+    trainOnWarn=$(printf "%s" "$8" | sed "s/'/ /g")
+    trainEND=$(printf "%s" "$9" | sed "s/'/ /g")
+    preTrain=$(printf "%s" "${10}" | sed "s/'/ /g")
     wwMinThresh=${11} 
     minInstTrainedForInsertion=${12} 
     
@@ -485,7 +484,7 @@ for PROBLEM in $PROBLEMS; do
                   driftDetectionAlgo=$(echo ${driftDetection} | sed 's/ //g')
                   
                   if [ $1 == "NA_1" ]; then
-                    NA="meta.NA -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes1} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection})"
+                    NA="meta.GroCH -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes1} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}"
                     ALGORITHM=${NA}                                                                                                                        
                     ALGOTOK=$(echo "NA_HT_${NA_groupMaxSize}_1_${NA_distanceThresh}_${gng_lambda}_${gng_maxAge}_${driftDetectionAlgo}-${NA_drift_adwin_confidence}_${trainOnWarn}_${trainEND}_${preTrain}_${wwMinThresh}_${minInstTrainedForInsertion}_${forceEarlyDrifts}_${alwaysTransitToBlankClassifAtEarlyDrift}_${instanceThreshForInsertions}" | sed 's/ //g')
                     # #
@@ -509,7 +508,7 @@ for PROBLEM in $PROBLEMS; do
                     ${evaluation}Window 
                   fi
                   if [ $1 == "NA_2" ]; then
-                    NA="meta.NA -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection})"
+                    NA="meta.GroCH -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}"
                     ALGORITHM=${NA}
                     echo "***************"
                     echo ${DATASET}
@@ -537,7 +536,7 @@ for PROBLEM in $PROBLEMS; do
                     if [ $1 == "NA_1" ]; then
                       echo $driftDetection
                       
-                      NA="meta.NA -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes1} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection})"
+                      NA="meta.GroCH -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes1} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}"
                       ALGORITHM=${NA}
                       echo "***************"
                       # echo ${DATASET}
@@ -553,7 +552,7 @@ for PROBLEM in $PROBLEMS; do
                       ${evaluation}Window 
                     fi
                     if [ $1 == "NA_2" ]; then
-                      NA="meta.NA -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection})"
+                      NA="meta.GroCH -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}"
                       ALGORITHM=${NA}
                       echo "***************"
                       echo ${DATASET}
@@ -573,7 +572,7 @@ for PROBLEM in $PROBLEMS; do
                   # common block with HDDMA
                   if [ $1 == "NA_1" ]; then 
                     driftDetectionAlgo=$(echo ${driftDetection} | sed 's/ //g')
-                    NA="meta.NA -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes1} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection})"
+                    NA="meta.GroCH -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes1} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}"
                     ALGORITHM=${NA}
                     echo "***************"
                     echo ${DATASET}
@@ -590,7 +589,7 @@ for PROBLEM in $PROBLEMS; do
                   fi
                   if [ $1 == "NA_2" ]; then
                     driftDetectionAlgo=$(echo ${driftDetection} | sed 's/ //g')
-                    NA="meta.NA -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection})"
+                    NA="meta.GroCH -l (${NA_baseClassifier}) ${forceEarlyDrifts} ${alwaysTransitToBlankClassifAtEarlyDrift} ${instanceThreshForInsertions} ${trainOnWarn} ${trainEND} ${preTrain} -w ${wwMinThresh} -I ${minInstTrainedForInsertion} -D 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}"
                     ALGORITHM=${NA}
                     echo "***************"
                     echo ${DATASET}
@@ -682,7 +681,7 @@ for PROBLEM in $PROBLEMS; do
   #                     ${evaluation}Window 
   #                   fi
   #                   if [ $1 == "NA_2_2det" ]; then
-  #                     NA="meta.NA -l ${NA_baseClassifier} -d 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -x (${driftDetection}) -p (${warningDet})"
+  #                     NA="meta.GroCH -l ${NA_baseClassifier} -d 1 -z 1 -k ${NA_feature_subset_indexes2} -M ${NA_groupMaxSize} -t ${NA_distanceThresh} -c (GNG -l ${gng_lambda} -m ${gng_maxAge} -c 2147483647 -b) -o ${DATAPATH}/${PROBLEM}/${mahalanobis_init_set} -x (${driftDetection}) -p (${warningDet})"
   #                     ALGORITHM=${NA}
   #                     echo "***************"
   #                     echo ${NA}
@@ -810,7 +809,7 @@ for PROBLEM in $PROBLEMS; do
                 if [ "${RCD_driftDet}" == "ADWINChangeDetector" ]; then
                     for RCD_drift_adwin_confidence in $RCD_drift_adwin_confidences; do
                       driftDetection="${RCD_driftDet} -a 1.0E-${RCD_drift_adwin_confidence}"
-                      RCD="meta.RCD -c ${RCD_c} -l ${RCD_baseClassifier} -a (KNN -k ${RCD_k}) -s ${RCD_s} -b ${RCD_b} -t ${RCD_t} -d (${driftDetection})" # (1 tree)
+                      RCD="meta.RCD -c ${RCD_c} -l ${RCD_baseClassifier} -a (KNN -k ${RCD_k}) -s ${RCD_s} -b ${RCD_b} -t ${RCD_t} -d (${driftDetection}) -V ${CONSOLE_LOG_LEVEL:-3}" # (1 tree)
                       ALGORITHM=${RCD}
                       echo "***************"
                       echo ${RCD}

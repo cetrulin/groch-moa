@@ -51,6 +51,7 @@ import weka.core.MahalanobisDistance;
 // import weka.gui.beans.Clusterer;
 import weka.core.converters.ArffLoader.ArffReader;
 import moa.classifiers.Classifier;
+import moa.classifiers.trees.HoeffdingTree;
 import moa.classifiers.core.driftdetection.ChangeDetector;
 import moa.classifiers.drift.DriftDetectionMethodClassifierExt;
 import moa.classifiers.igngsvm.gng.GNG;
@@ -136,6 +137,50 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 
 	public IntOption logLevelOption = new IntOption("eventsLogFileLevel", 'h',
 			"0 only logs drifts; 1 logs drifts + warnings; 2 logs every data example", 1, 0, 2);
+
+	public IntOption consoleLogLevelOption = new IntOption("consoleLogLevel", 'V',
+			"Console observability log level: 0 = silent, 1 = lifecycle & drifts, 2 = CH groups & candidates, 3 = deep tree & node structures", 1, 0, 3);
+
+	public void logConsole(int level, String message) {
+		if (this.consoleLogLevelOption.getValue() >= level) {
+			System.out.println(message);
+		}
+	}
+
+	public String describeLearner(Classifier c) {
+		if (c == null) return "null";
+		try {
+			if (c instanceof moa.classifiers.trees.HoeffdingTree) {
+				java.lang.reflect.Field field = null;
+				Class<?> clazz = c.getClass();
+				while (clazz != null && field == null) {
+					try {
+						field = clazz.getDeclaredField("treeRoot");
+					} catch (NoSuchFieldException e) {
+						clazz = clazz.getSuperclass();
+					}
+				}
+				if (field != null) {
+					field.setAccessible(true);
+					Object root = field.get(c);
+					if (root != null) {
+						java.lang.reflect.Method getDist = root.getClass().getMethod("getObservedClassDistribution");
+						double[] dist = (double[]) getDist.invoke(root);
+						double sum = 0;
+						if (dist != null) {
+							for (double d : dist) sum += d;
+						}
+						return "treeRoot=" + root.getClass().getSimpleName() + ", total_seen=" + (long)sum + ", dist=" + java.util.Arrays.toString(dist);
+					} else {
+						return "treeRoot=None, total_seen=0, dist=[]";
+					}
+				}
+			}
+		} catch (Exception e) {
+			// fallback
+		}
+		return c.getClass().getSimpleName();
+	}
 
 	public ClassOption evaluatorOption = new ClassOption("baseClassifierEvaluator", 'f',
 			"Classification performance evaluation method in each base classifier for voting.",
@@ -416,7 +461,6 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		if (!this.disableDriftDetectionOption.isSet()) {
 			boolean correctlyClassified = Utils.maxIndex(this.active.getVotesForInstance(instance)) == (int) instance.classValue();
 			if (this.isOnWarningWindow) { // If on warning, update weight of the bkg learner based on its result
-				// TODO: move to the end once I refactor the code to be GroCH only // aduarez 26/04/2021
 				this.active.updateWeight(correctlyClassified, this.betaOption.getValue());
 			    this.active.bkgLearner.updateWeight(Utils.maxIndex(this.active.bkgLearner.getVotesForInstance(instance)) == 
 			    									(int) instance.classValue(), this.betaOption.getValue());
@@ -436,7 +480,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 //				System.out.println("INSTANCE: "+this.instancesSeen);
 				// If a new warning is detected, GroCH starts its warning window. 
 				// Apart from the warning zone (if the flag is active, the warning window will have at least and as maximum a duration of n examples, specified as an input parameter. 
-				// This gives the GroCH a chance to foresee drifts preceded by blips or small gradual change periods).
+				// This gives GroCH a chance to foresee drifts preceded by blips or small gradual change periods).
 				assert this.driftDetectionMethod.getWarningZone() == true; // otherwise there is a bug
 				initWarningWindow(); // Step 7.2.2: new warning?
 			}
@@ -444,13 +488,11 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 //			// this.driftDetectionMethod.input(correctlyClassified ? 0 : 1);  // updated already
 //			System.out.println(this.driftDetectionMethod.getChange());
 			if (this.driftDetectionMethod.getChange() | ((this.instancesSeen - this.lastDriftOn) % this.periodBetweenDriftsOption.getValue() == 0)) {
-//	        	if(this.instancesSeen > MIN_LIMIT_PRINTS & this.instancesSeen < MAX_LIMIT_PRINTS)
-//	        		System.out.println("Enters in drift get change!");	        	
 				long startTime = System.nanoTime();
-				System.out.println("Lenght of warning window: " + this.W.size());
+				logConsole(1, "DRIFT DETECTED [Example " + this.instancesSeen + "]. Warning window size: " + this.W.size() + ", delta: " + (this.instancesSeen - this.lastDriftOn));
 				this.lastDriftDelta = this.instancesSeen - this.lastDriftOn;
-				System.out.println("Last drift was " + this.lastDriftDelta + " examples before.");
-				System.out.println("DRIFT Delta equal or greater than insertion threshold? " + 
+				logConsole(2, "Last drift was " + this.lastDriftDelta + " examples before.");
+				logConsole(2, "DRIFT Delta equal or greater than insertion threshold? " + 
 									(this.lastDriftDelta >= this.insertionPeriodOption.getValue()));
 				driftHandlingImpl(correctlyClassified, instance); // Step 7.3: new drift?  (remove second param sent if early drifts dont need to be forced)
 				if (this.eventsLogFile != null && this.logLevelOption.getValue() >= 1) {
@@ -670,11 +712,11 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			
 			// DEBUG
 			if (this.debug_internalev) {
-//				System.out.println("------------------");
-				System.out.println("W size: "+this.W.size());
-//				System.out.println("Internal window size: "+this.active.internalWindowEvaluator.getCurrentSize(0));
-//				System.out.println("BKG Internal window size: "+this.active.bkgLearner.internalWindowEvaluator.getCurrentSize(0));
-//				System.out.println("------------------");
+				logConsole(2, "------------------");
+				logConsole(2, "W size: "+this.W.size());
+				logConsole(2, "Internal window size: "+this.active.internalWindowEvaluator.getCurrentSize(0));
+				logConsole(2, "BKG Internal window size: "+this.active.bkgLearner.internalWindowEvaluator.getCurrentSize(0));
+				logConsole(2, "------------------");
 			}
 		}
 		// System.out.println("SIZE OF W: "+ W.numInstances());
@@ -688,7 +730,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			this.active.bkgLearner = null; // Lines 8 and 18
 			this.active.internalWindowEvaluator = null;
 			this.active.tmpCopyOfClassifier = null;
-			System.out.println("[Example " + this.instancesSeen + "] BKG AND TMP CLASSIFIERS AND INTERNAL WINDOW RESTARTED");
+			logConsole(2, "[Example " + this.instancesSeen + "] BKG AND TMP CLASSIFIERS AND INTERNAL WINDOW RESTARTED");
 			// Change 3 on 31/10/2020: if we reset the warning, we should train the topology with the last received examples. 
 			//  we should also train the active learner if it has not been trained during warning, to avoid hundreds of pointless drifts/warnings.
 			
@@ -713,8 +755,10 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 //		System.out.println("W size was: "+W.numInstances());
 		// TODO: W and isOnWarningWindow params could be embedded/merged with NAChangeDetector (isOnWarningWindow should be == warningZone)
 		this.W.delete(); // Lines 9 and 19 (it also initializes the object W)
-		System.out.println("W ERASED!");
 		this.isOnWarningWindow = false;
+		if (!startingWW) {
+			logConsole(2, "WARNING WINDOW RESET [Example " + this.instancesSeen + "] (W deleted)");
+		}
 		if (!this.disableRecurringDriftDetectionOption.isSet()) this.CH.decreaseNumberOfWarnings(0); // update applicable concepts
 	}
 	
@@ -733,6 +777,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	protected void initWarningWindow() {
 		this.lastWarningOn = this.instancesSeen;
 		this.numberOfWarningsDetected++;
+		logConsole(1, "WARNING DETECTED [Example " + this.instancesSeen + "]");
 		
 		// Step 0 (Lines 17-19)
 		resetWarningWindow(true);
@@ -817,11 +862,11 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 				this.CH.addLearnerToGroup(previousTopologyGroupId, cn);	
 				
 				// Debugging
-				System.out.println("=========================");
-				System.out.println("Creating group #"+datasetID+" with ID: "+previousTopologyGroupId+
+				logConsole(2, "=========================");
+				logConsole(2, "Creating group #"+datasetID+" with ID: "+previousTopologyGroupId+
 						" Trained with "+instancesSeen+" instances from file "+paths[datasetID]);
-				System.out.println("Its topology has "+(this.CH.get(previousTopologyGroupId).getTopologyPrototypes().numAttributes())+" prototypes.");
-				System.out.println("It has now "+(this.CH.get(previousTopologyGroupId).values()).size()+" concepts");
+				logConsole(2, "Its topology has "+(this.CH.get(previousTopologyGroupId).getTopologyPrototypes().numAttributes())+" prototypes.");
+				logConsole(2, "It has now "+(this.CH.get(previousTopologyGroupId).values()).size()+" concepts");
 //				System.out.println("Its classifier evaluator has a performance of: " + classificationEvaluator.getPerformanceMeasurements()[0].getValue());
 			}	
 			logMeanDistancesBetweenPretrainedGroups();
@@ -831,7 +876,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	private void logMeanDistancesBetweenPretrainedGroups() {
 		// START of part for reporting purposes only
 		// 11-01-2021 ASC
-		System.out.println("Computing distance between groups");
+		logConsole(2, "Computing distance between groups");
 		for (int i = 0; i < this.CH.size(); i++) {
 			for (int j = 0; j < this.CH.size(); j++) {
 //				if ( i != j ) {
@@ -983,9 +1028,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 
 		// 1st Train Topology from buffer if the training is not online
 		if (this.W.numInstances() >= this.minWSizeForDriftOption.getValue()) {
-			System.out.println(); System.out.println(); System.out.println();
-			System.out.println(); System.out.println(); System.out.println();
-			System.out.println("DRIFT DETECTED!");
+			logConsole(1, "DRIFT DETECTED [Example " + this.instancesSeen + "]. Current CH size: " + this.CH.size());
 			
 			// Retrieval from CH
 			if (!this.disableRecurringDriftDetectionOption.isSet()) { // step 1: lines 29-31 of the algorithm
@@ -1007,10 +1050,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			// This forces Early drifts type 1 only (warning window small). This is done by forcing a BKG drift.
 			// Early drifts type 2 (not enough prototypes) may corrupt the Concept History. Thus, they shouldn't be forces.
 			if (this.forceEarlyDriftsOption.isSet()) {
-					System.out.println("There weren't enough instances in W. "
-							+ "In fact there were " + this.W.size() + " examples in W. \n"
-							+ "A drift was forced on [Example " + this.instancesSeen + "] as a consequence. \n"
-							+ "If this happens often, check the confidence intervals assigned for warnings vs drifts.");
+					logConsole(1, "EARLY_DRIFT_1 - NOT ENOUGH EXAMPLES DURING WARNING (" + this.W.size() + " in W)");
 					// If WW is 0, we initialize it to force the BKG drift.
 					if (this.W.numInstances() < 1 | this.alwaysResetWarningAtEarlyDriftOption.isSet()) {
 						initWarningWindow(); // a bkg learner and internal evaluators are created for comparison
@@ -1026,18 +1066,17 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			}
 			else {
 				if(this.W.numInstances() < this.minWSizeForDriftOption.getValue())
-					System.out.println("There weren't enough instances in W. In fact there were " + this.W.size() + " examples in W. "
-							+ "If this happens often, check the confidence intervals assigned for warnings vs drifts.");
+					logConsole(1, "EARLY_DRIFT_1 - NOT ENOUGH EXAMPLES DURING WARNING (" + this.W.size() + " in W)");
 				registerDriftFalseAlarm();
 				switchInfo.setFalseAlarm();
 			}
 		}
 		if (switchInfo.isFalseAlarm() && this.saveClassifiersOnFalseAlarmOption.isSet() && this.active.tmpCopyOfClassifier != null) {
-			System.out.println("IMP: There was a false alarm. But as its flag is true, the tmp copy of the classifier before warning is sent to the Concept History.");				
+			logConsole(1, "FALSE ALARM ON DRIFT SIGNAL - RETAINING WARNING WINDOW");				
 			insertConceptToCH(switchInfo); // save tmp copy of active classifier to CH as agreed with acervant and dquintan on 09/12/2019						
 		}
 //		assert groupRetrieved == switchInfo.getRetrievedGroupID();
-		System.out.println("Pn size:" + this.topology.getNumberOfPrototypesCreated());
+		logConsole(2, "Pn size: " + this.topology.getNumberOfPrototypesCreated());
 		// Reset drift independently on both false alarm and actual drift cases.
 //		this.driftDetectionMethod = new NAChangeDetector(this.driftDetectionMethodOption, 
 //				((ChangeDetector) getPreparedClassOption(this.driftDetectionMethodOption)).copy());
@@ -1045,7 +1084,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		else this.driftDetectionMethod.setDriftDetector(((ChangeDetector) getPreparedClassOption(this.driftDetectionMethodOption)).copy());
 
 		this.newTopology = null;
-		System.out.println("Although the new topology is null, the old one is of size: "+this.topology.getPrototypes().size());
+		logConsole(2, "Old topology size: " + this.topology.getPrototypes().size());
 		/*System.out.print("just after creation: ");
 		this.CH.printTopologies();
 		System.out.println();*/
@@ -1055,7 +1094,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		if (insert) insertConceptToCH(switchInfo);  // Insertion in CH (Lines 23-26) 
 		this.active.reset(); // reset base classifier and transition to bkg or recurring learner (step 3)
 		
-		System.out.println("OLD TOPOLOGY USED FOR INSERTION. NOW 'TRANSFER' OF EXAMPLES RECEIVED DURING WARNING.");
+		logConsole(2, "OLD TOPOLOGY USED FOR INSERTION. NOW 'TRANSFER' OF EXAMPLES RECEIVED DURING WARNING.");
 		// Reset warning related params (but not the learners as these are used at the next step)
 		if (this.newTopology != null) this.topology = updateTopology(this.newTopology.clone(), this.W); // line 31
 //		else {
@@ -1066,10 +1105,10 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		// 26-01-2021: line below commented out  (so we can see if what decreases performance is to train the WW after drift) // TODO: add option?
 //		if (!switchInfo.bkgDrift) for (int i = 0; i < this.W.size(); i++) this.active.trainOnInstance(this.W.get(i)); // NEW LINE 15-01-2021. // commented out on 31/01/2021. already covered by 'change 1' done at 31/10/2020.
 		if (!this.trainOnlineFlagOption.isSet()) this.topology.trainFromBuffer();  // this trains GNG with the W if relevant.
-		System.out.println("W HAS " + this.W.size() + " INSTANCES.");
-		System.out.println("Topology after drift has a size of: " + this.topology.getPrototypes().size());
-		System.out.println("Topology after drift has seen: " + this.topology.getInstancesSeenByLearner() + " examples. ");
-		System.out.println("Base classifier after drift has seen: " + this.active.instancesTrained + " examples");
+		logConsole(2, "W HAS " + this.W.size() + " INSTANCES.");
+		logConsole(2, "Topology after drift has a size of: " + this.topology.getPrototypes().size());
+		logConsole(2, "Topology after drift has seen: " + this.topology.getInstancesSeenByLearner() + " examples.");
+		logConsole(2, "Base classifier after drift has seen: " + this.active.instancesTrained + " examples");
 		resetWarningWindow(false); // step 4 and line 32. false as argument as the bkg related params are reseted in the prior line.
 	}
 
@@ -1082,16 +1121,15 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	protected void insertConceptToCH(ConceptDrift retrievalProperties) {
 		
 		// Update topology for the insertion if the training of it it's done in batches when a drift is detected
-		System.out.println("Training from buffer? "+ !this.trainOnlineFlagOption.isSet());
+		logConsole(2, "Training from buffer? " + !this.trainOnlineFlagOption.isSet());
 		if (!this.trainOnlineFlagOption.isSet()) this.topology.trainFromBuffer();
 		
-		System.out.println();
-		System.out.println("Pc size:" + this.topology.getNumberOfPrototypesCreated());
+		logConsole(2, "Pc size: " + this.topology.getNumberOfPrototypesCreated());
 		
 		// Insertion in CH (Lines 23-26)
 		if (this.topology.getNumberOfPrototypesCreated() >= this.minTopologySizeForDriftOption.getValue()){
-			System.out.println("The topology has been trained (before the warning) with "+this.topology.getInstancesSeenByLearner()+" instances so far.");
-			System.out.println("This is beyond the treshold so GroCH proceeds to insert to the CH.");
+			logConsole(2, "The topology has been trained (before the warning) with " + this.topology.getInstancesSeenByLearner() + " instances so far.");
+			logConsole(2, "This is beyond the treshold so GroCH proceeds to insert to the CH.");
 			
 			// First, it needs to find the group ID for the insertion
 			Instances tmpPrototypes = this.topology.getPrototypes(); // line 23
@@ -1101,10 +1139,11 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			if (this.eventsLogFile != null && this.logLevel >= 0) logEvent(getInsertionToCHEvent(groupInserted));
 			if (this.CH.size() == 0 || groupInserted == -1) { // line 25
 				groupInserted = this.groupsSeen++;
-	//			System.out.println("CREATING NEW GROUP: " + previousTopologyGroupId); 
+				logConsole(1, "Creating NEW Group " + groupInserted + " in CH");
 				this.CH.createNewGroup(groupInserted, this.topology.clone(), this.topologyAttributeSubset); //, this.newTopology); // line 27
+			} else {
+				logConsole(1, "Matched Existing Group " + groupInserted + " in CH for GC");
 			}
-	//		else System.out.println("SELECTING FROM GROUP: " + previousTopologyGroupId); 
 						
 			// Move copy of active classifier made before warning to Concept History.
 			this.active.tmpCopyOfClassifier.setHistoryID(this.conceptsSeen++);
@@ -1113,113 +1152,75 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			// Only insert if the group differs
 			if (groupRetrieved != groupInserted || activeImprovesBestRetrieved || 
 					this.alwaysInsertClassifiersOption.isSet()) {  // TODO: alwaysInsertClassifiersOption not tested
-				// we insert this first to take it also into account (so it's considered by the replacement policy)
-	//			System.out.println("GROUP INSERTED - activeHasLowerErr == "+activeImprovesBestRetrieved);
-	//			this.CH.addLearnerToGroup(groupInserted, this.active.tmpCopyOfClassifier); // line 28  // debug. check that this is not a duplicate. that it's a separate object.
-				System.out.println("GROUP SIZE IS: "+this.CH.getConceptsFromGroup(groupInserted).size());
+				logConsole(2, "GROUP SIZE IS: " + this.CH.getConceptsFromGroup(groupInserted).size());
 				if (this.CH.getConceptsFromGroup(groupInserted).size() >= maxGroupSizeOption.getValue()){
-					System.out.println("GROUP MAX SIZE EXCEEDED!");
+					logConsole(1, "GROUP MAX SIZE EXCEEDED in Group " + groupInserted + " (Size: " + this.CH.getConceptsFromGroup(groupInserted).size() + ")");
+					ArrayList<Integer> beforeKeys = new ArrayList<>(this.CH.getConceptKeySetFromGroup(groupInserted));
+					Integer evictedKey = -1;
 					// Then remove a classifier using a policy
 					switch (this.groupReplacementPolicyOption.getChosenLabel()) {
-	//					case "Greatest Error Out":
-	//						assert groupInserted != -1;
-	//						// 2 Retrieve best applicable classifier from Concept History (if a CH group applies)
-	//						HashMap<Integer, Double> ranking = rankConceptHistoryClassifiers(groupInserted);
-	//						if (ranking.size() > 0) {
-	//							System.out.println("5555555 groups ranking for removal of classifiers before insertion just below:");
-	//							System.out.println(ranking.toString());
-	//							System.out.println("555555 TEST SIZE OF CH GROUP - 1 BEFORE REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
-	//							this.CH.removeLearnerFromGroup(groupInserted, getMaxKey(ranking));
-	//							System.out.println("555555 ranking now is (see below):");
-	//							System.out.println(rankConceptHistoryClassifiers(groupInserted));
-	//							System.out.println("555555 TEST SIZE OF CH GROUP - 2 AFTER REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
-	//						}						
-	//						break;
-	//					case "LRU":   
-							// This is done by FIFO now
-	//						System.out.println("555555 TEST SIZE OF CH GROUP - 1 BEFORE REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
-	//						System.out.println("555555 MODIFIED TIMES: "+this.CH.getConceptLastTimeUsedFromGroup(groupInserted).toString());
-	//						this.CH.removeLearnerFromGroup(groupInserted, getMinKey(this.CH.getConceptLastTimeUsedFromGroup(groupInserted)));
-	//						System.out.println("555555 ranking now is (see below):");
-	//						System.out.println("555555 TEST SIZE OF CH GROUP - 2 AFTER REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
-	//						break;
 						case "Least Used Model":  
-							System.out.println("555555 TEST SIZE OF CH GROUP - 1 BEFORE REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
-							System.out.println("@@@@@@@@@@");
-							System.out.println("33 others for debugging:");
-							System.out.println("555555 AGES: "+this.CH.getConceptAgesFromGroup(groupInserted).toString());
-							System.out.println("555555 MODIFIED TIMES: "+this.CH.getConceptLastTimeUsedFromGroup(groupInserted).toString());
-							System.out.println("@@@@@@@@@@");
-							System.out.println("555555 TIMES USED: "+this.CH.getConceptTimesUsedFromGroup(groupInserted).toString());
-							System.out.println("555555 EXAMPLES TRAINED: "+this.CH.getConceptExamplesFromGroup(groupInserted).toString());
-
-							// This removes the oldest of the least used classifiers (assuming that min times used per group is shared across many. if not, it removes the least used.)
 							ArrayList<Integer> subset = getMinKeys(this.CH.getConceptTimesUsedFromGroup(groupInserted)); // least used classifiers
-	//						this.CH.removeLearnerFromGroup(groupInserted, getMinKey(this.CH.getConceptAgesFromGroupSubset(groupInserted, subset))); 
-							this.CH.removeLearnerFromGroup(groupInserted, getMinKey(this.CH.getConceptLastTimeUsedFromGroupSubset(groupInserted, subset))); 
-							System.out.println("555555 ranking now is (see below):");
-							System.out.println("555555 TEST SIZE OF CH GROUP - 2 AFTER REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
+							evictedKey = getMinKey(this.CH.getConceptLastTimeUsedFromGroupSubset(groupInserted, subset));
 							break;
 						case "FIFO":
-							System.out.println("555555 TEST SIZE OF CH GROUP - 1 BEFORE REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
-	//						System.out.println("555555 AGES: "+this.CH.getConceptAgesFromGroup(groupInserted).toString());
-	//						this.CH.removeLearnerFromGroup(groupInserted, getMinKey(this.CH.getConceptAgesFromGroup(groupInserted)));
-							System.out.println("555555 AGES: "+this.CH.getConceptLastTimeUsedFromGroup(groupInserted).toString());
-							// IMP: As createdOn gives information about the origin of the classifier, there are many cases of recurring ones having sharing creation. 
-							// For this reason, FIFO now uses the last time when that classifier was trained as a mechanism to know which one is older (the ID could also be used for this purpose).
-							this.CH.removeLearnerFromGroup(groupInserted, getMinKey(this.CH.getConceptLastTimeUsedFromGroup(groupInserted)));
-							System.out.println("555555 ranking now is (see below):");
-							System.out.println("555555 TEST SIZE OF CH GROUP - 2 AFTER REMOVAL: "+this.CH.getConceptKeySetFromGroup(groupInserted));
+							evictedKey = getMinKey(this.CH.getConceptLastTimeUsedFromGroup(groupInserted));
 							break;
-						// TODO: apply theory of cache replacement policies: 
-						//	- remove the one trained with less examples (less instancesSeen)
-						//  - remove less recently used (LRU). create another variable as createdOn as, reusedOn..
-						//  - policy Least frequent recently used (LFRU)
-						//  - remove oldest 
-						//  - Make them to be distributed over time.
 						default:
 							break;
-					}				
-	
-				}			
-	//			System.out.println("GROUP INSERTED - activeHasLowerErr == "+activeImprovesBestRetrieved+
-	//					" on instance: "+this.instancesSeen);
-				// If we insert only examples to a single classifier per group, then only crate a classifier if it's the first one in the group
-				if (!this.insertExamplesOnlyOption.isSet() | this.CH.getConceptsFromGroup(groupInserted).size() == 0)
-					this.CH.addLearnerToGroup(groupInserted, this.active.tmpCopyOfClassifier); // line 28
-				else if (this.insertExamplesOnlyOption.isSet()) {
-//					System.out.println("concepts from group: "+ this.CH.getConceptsFromGroup(groupInserted).size());
-//					System.out.println("assertion "+this.active.instancesTrained+" == "+this.active.conceptBuffer.size() 
-//					+" : "+ (this.active.instancesTrained == (long) this.active.conceptBuffer.size()));
-					assert this.active.instancesTrained == (long) this.active.conceptBuffer.size();
-					System.out.println("Concept buffer size before training: "+this.active.conceptBuffer.size());
-					this.CH.trainGroupLearner(groupInserted, this.CH.get(groupInserted).keys().get(0), this.active.conceptBuffer);
-					System.out.println("Concept buffer size after training: "+this.active.conceptBuffer.size());
+					}
+					if (evictedKey != -1) {
+						Concept evictedConcept = this.CH.get(groupInserted).getConcept(evictedKey);
+						long cAt = evictedConcept != null ? evictedConcept.getCreatedOn() : -1;
+						long ltu = evictedConcept != null ? evictedConcept.instancesSeen : -1;
+						long usage = evictedConcept != null ? evictedConcept.getTimesUsed() : -1;
+						Classifier evictedClassifier = evictedConcept != null && evictedConcept.ConceptLearner != null ? evictedConcept.ConceptLearner.classifier : null;
 
+						this.CH.removeLearnerFromGroup(groupInserted, evictedKey);
+						ArrayList<Integer> afterKeys = new ArrayList<>(this.CH.getConceptKeySetFromGroup(groupInserted));
+
+						logConsole(1, "RemoveClassifier in Group " + groupInserted + " (Policy='" + this.groupReplacementPolicyOption.getChosenLabel() + "'): evicted id=" + evictedKey + " (c_at=" + cAt + ", ltu=" + ltu + ", usage=" + usage + "). Size: " + beforeKeys.size() + " -> " + afterKeys.size());
+						logConsole(2, "    Before removal: " + beforeKeys);
+						logConsole(2, "    After removal:  " + afterKeys);
+						if (this.consoleLogLevelOption.getValue() >= 3) {
+							logConsole(3, "    Evicted model structure: " + describeLearner(evictedClassifier));
+							for (int remKey : afterKeys) {
+								Concept remC = this.CH.get(groupInserted).getConcept(remKey);
+								Classifier remClf = remC != null && remC.ConceptLearner != null ? remC.ConceptLearner.classifier : null;
+								logConsole(3, "    Remaining model #" + remKey + ": " + describeLearner(remClf));
+							}
+						}
+					}
+				}			
+				// If we insert only examples to a single classifier per group, then only create a classifier if it's the first one in the group
+				if (!this.insertExamplesOnlyOption.isSet() | this.CH.getConceptsFromGroup(groupInserted).size() == 0) {
+					int newConceptId = this.active.tmpCopyOfClassifier.historyIndex;
+					this.CH.addLearnerToGroup(groupInserted, this.active.tmpCopyOfClassifier); // line 28
+					logConsole(1, "INSERTING FOREGROUND MODEL (id=" + newConceptId + ") into Group " + groupInserted + " (size after: " + this.CH.getConceptsFromGroup(groupInserted).size() + ")");
+					logConsole(2, "  Group " + groupInserted + " classifiers: " + this.CH.getConceptKeySetFromGroup(groupInserted));
+					if (this.consoleLogLevelOption.getValue() >= 3) {
+						Classifier insertedClf = this.active.tmpCopyOfClassifier.ConceptLearner != null ? this.active.tmpCopyOfClassifier.ConceptLearner.classifier : null;
+						logConsole(3, "  Inserted classifier tree structure: " + describeLearner(insertedClf));
+					}
+				} else if (this.insertExamplesOnlyOption.isSet()) {
+					assert this.active.instancesTrained == (long) this.active.conceptBuffer.size();
+					logConsole(2, "Concept buffer size before training: " + this.active.conceptBuffer.size());
+					this.CH.trainGroupLearner(groupInserted, this.CH.get(groupInserted).keys().get(0), this.active.conceptBuffer);
+					logConsole(2, "Concept buffer size after training: " + this.active.conceptBuffer.size());
 				}
-				
+			} else {
+				logConsole(1, "SKIPPING INSERTION: Error is not lower than best in identical group");
 			}
-	//		else {
-	//			System.out.println("GROUP NOT INSERTED - activeHasLowerErr == "+activeImprovesBestRetrieved+
-	//					" on instance: "+this.instancesSeen);
-	//			System.out.println("GROUP INSERTED : " + groupInserted);
-	//			System.out.println("GROUP RETRIEVED : " + groupRetrieved);
-	//		}
-	//		System.out.println("TEST SIZE OF CH GROUP - 2 AFTER INSERTION: "+this.CH.getConceptsFromGroup(groupInserted).size());
 			
-			if (this.updateGroupTopologiesOption.isSet()) { // not in v5 of algorithm (line 29 in v4)
-				// OJO: esta linea de abajo necesita agregar .clone/.copy en algun sitio, ya que no esta creando objetos nuevos y  hace que el updatetopology de abajo actualice el objeto de grupo de CH
-				// this.CH.setGroupTopology(previousTopologyGroupId,
-				//		updateTopology(this.CH.copyTopologyFromGroup(previousTopologyGroupId), this.topology.getPrototypes()));
-				// asuarez 02-06.2019. quiza esto incluso fuese mas adecuado
-				this.CH.setGroupTopology(groupInserted, this.topology.clone()); // pero entonces perderiamos mucho historico..
+			if (this.updateGroupTopologiesOption.isSet()) {
+				this.CH.setGroupTopology(groupInserted, this.topology.clone());
 			}
 			
 		} else {		
 			// Logging each independent case. First lack of prototypes for drift and after, missing examples 
 			//  in the warning window and trigger relevant actions according to option values.
 			if (this.topology.getNumberOfPrototypesCreated() < this.minTopologySizeForDriftOption.getValue())
-				System.out.println("There weren't enough prototypes in the topology.");
+				logConsole(1, "There weren't enough prototypes in the topology.");
 		}
 	}
 
@@ -1325,7 +1326,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		
 		// 1 Raise a false alarm for the drift if the background learner is not ready
 		if (this.active.bkgLearner == null) {
-			System.out.println("False alarm due to lack of BKG classifier on: "+String.valueOf(this.lastDriftOn));  // extra trace by asuarez at 08122019
+			logConsole(1, "SelectDrift: FALSE ALARM (lack of BKG classifier on " + this.lastDriftOn + ")");
 			return new ConceptDrift(registerDriftFalseAlarm(), false, ranking, indexOfBestRanked, historyGroups.get(0), false);  // first pos is the closest group (we don't compare rankings here)
 		}
 		// 2 Retrieve best applicable classifier from Concept History (if a CH group applies)
@@ -1337,39 +1338,47 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		} else historyGroup = -1;
 		if (ranking.size() > 0) {
 			ArrayList<Integer> indexesOfBestRanked = getMinKeys(ranking); // find indexes of concepts with lowest values (error)
-			System.out.println("PRIORITY ARE "+this.priorityOfRecurringClassifiersOption.getChosenLabel()+" CLASSIFIERS.");
+			logConsole(2, "SelectDrift candidates ranking: " + ranking.toString() + " (Priority: " + this.priorityOfRecurringClassifiersOption.getChosenLabel() + ")");
 			if (this.priorityOfRecurringClassifiersOption.getChosenLabel().equals("Old")) {
 				indexOfBestRanked = getMinKey(this.CH.getConceptLastTimeUsedFromGroupSubset(historyGroup, indexesOfBestRanked));
 			} else {  // Prioritise the last ones used
 				indexOfBestRanked = getMaxKey(this.CH.getConceptLastTimeUsedFromGroupSubset(historyGroup, indexesOfBestRanked));
 			}
-//			indexOfBestRanked = getMinKey(ranking); // find indexes of concepts with lowest values (error)
-			System.out.println("INDEX OF "+this.priorityOfRecurringClassifiersOption.getChosenLabel().toUpperCase() + 
-					"EST OF THE BEST CH CLASSIFIERS IS: " + indexOfBestRanked);
 			errorOfBestRanked = Collections.min(ranking.values());
 			activeImprovesRecurring = activeIsBetterThanCHbaseClassifier(errorOfBestRanked);
+			logConsole(2, "  err_c=" + String.format("%.4f", this.active.lastError) + ", best_recurring_err=" + String.format("%.4f", errorOfBestRanked) + ", best_idx=" + indexOfBestRanked);
 		}
 		// 3 Compare this against the background classifier and make the decision.
 		if (activeIsBetterThanBKGbaseClassifier()) {
 			if (ranking.size() > 0 && !activeImprovesRecurring) {
 				if(this.multiPassTopologyTrainingOption.isSet()) this.topology.trainUntilFulfillingStoppingCriteria();
 				registerRecurringDrift(indexOfBestRanked, historyGroup);
+				logConsole(1, "SelectDrift: TRANSITION TO HISTORICAL MODEL (selected id=" + indexOfBestRanked + " from group " + historyGroup + ", err=" + String.format("%.4f", errorOfBestRanked) + ")");
+				if (this.consoleLogLevelOption.getValue() >= 3) {
+					logConsole(3, "  Retrieved model tree structure: " + describeLearner(this.active.bkgLearner != null ? this.active.bkgLearner.classifier : null));
+				}
 			}
 			// False alarm if active classifier is still the best one and when there are no applicable concepts.
 			else {
-				System.out.println("False alarm, as the active is better than active and the CH of size "+ranking.size()+
-						" on  "+String.valueOf(this.lastDriftOn));  // extra trace by asuarez at 08122019
-				System.out.println("The err of the best ranked classifier was: "+errorOfBestRanked);
+				logConsole(1, "SelectDrift: FALSE ALARM - Retaining Foreground (err_c=" + String.format("%.4f", this.active.lastError) + " <= err_b=" + String.format("%.4f", this.active.bkgLearner != null ? this.active.bkgLearner.lastError : 0.0) + ")");
 				return new ConceptDrift(registerDriftFalseAlarm(), true, // true as active improves the retrieved
 						ranking, indexOfBestRanked, historyGroup, false); 
 			}
 		} else {
 			if(this.multiPassTopologyTrainingOption.isSet()) this.topology.trainUntilFulfillingStoppingCriteria();
-			if (ranking.size() > 0 && CHbaseClassifierIsBetterThanBkg(errorOfBestRanked))
+			if (ranking.size() > 0 && CHbaseClassifierIsBetterThanBkg(errorOfBestRanked)) {
 				registerRecurringDrift(indexOfBestRanked, historyGroup);
-			else {
+				logConsole(1, "SelectDrift: TRANSITION TO HISTORICAL MODEL (selected id=" + indexOfBestRanked + " from group " + historyGroup + ", err=" + String.format("%.4f", errorOfBestRanked) + ")");
+				if (this.consoleLogLevelOption.getValue() >= 3) {
+					logConsole(3, "  Retrieved model tree structure: " + describeLearner(this.active.bkgLearner != null ? this.active.bkgLearner.classifier : null));
+				}
+			} else {
 				registerBkgDrift();
 				isBkgDrift = true;
+				logConsole(1, "SelectDrift: TRANSITION TO BACKGROUND MODEL");
+				if (this.consoleLogLevelOption.getValue() >= 3) {
+					logConsole(3, "  Background model tree structure: " + describeLearner(this.active.bkgLearner != null ? this.active.bkgLearner.classifier : null));
+				}
 			}
 		} 
 		return new ConceptDrift(false, activeImprovesRecurring, ranking, indexOfBestRanked, historyGroup, isBkgDrift); // No false alarms raised at this point
@@ -1379,42 +1388,15 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	 * This auxiliary function updates either old or new topologies that will be merged with, compared with, or will replace to the current one.
 	 * */
 	protected Topology updateTopology(Topology top, Instances w2) {
-				
-		/* If there is a different stopping criteria, it should depend on the avg error obtained by the topologies
-		 * as at some point in the learning process GNG will only improve the accuracy a bit, and slowly, as the approximation should get better overtime.
-		 * Stopping early should only give us speed (loosing accuracy). If we do this (we may not need to), the tradeoff is the key.
-		int trainType = 0;
-		if(stopPercentageOption.getValue() > 0)
-			top.stoppingCriteriaOption.setValue((int)((this.stopPercentageOption.getValue() * (double) w2.size()) / 100.0));
-		
-		if(trainType==0) {
-			// We add them several times till achieving the stopping criteria as in iGNGSVM
-			// The effect of this would be a GNG topology that may not be able to keep expanding, which may be undesired in NA.
-			for (int i=0; top.getNumberOfPrototypesCreated()<top.stoppingCriteriaOption.getValue(); i++){
-				top.trainOnInstanceImpl((Instance) w2.get(i));
-		        	if(i+1==w2.numInstances()) i = -1;
-		    }
-		} else { */
-			// We add them once
 		for (int instPos = 0; instPos < w2.numInstances(); instPos++) {
 			top.trainOnInstanceImpl(w2.get(instPos).copy());
-			// System.out.println("prototypes created in topology:" + top.getNumberOfPrototypesCreated());
 		}
-		// }
-		return top; // if topology (Pc) is global, then we don't need to return this here
+		return top;
 	}
 		
     /**
      * This function ranks the best concepts from a given group of the Concept History
-     * -----------------------------------
-	 * This only takes into consideration Concepts sent to the Concept History
-	 * 	after the current classifier raised a warning (see this consideration in reset*)
-	 *
-	 * The Concept History owns only one learner per historic concept.
-	 * 	But each learner has a different window size and error.
-	 *
-	 * this.indexOriginal - pos of this classifier with active warning in ensemble
-	 */
+     */
 	protected HashMap<Integer, Double> rankConceptHistoryClassifiers(int historyGroup) {
 		HashMap<Integer, Double> groupRanking = new HashMap<Integer, Double>();
 		for (Concept auxConcept : this.CH.getConceptsFromGroup(historyGroup))
@@ -1424,7 +1406,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 						((DynamicWindowClassificationPerformanceEvaluator) auxConcept.ConceptLearner.internalWindowEvaluator)
 								.getFractionIncorrectlyClassified(0));
 			}
-		System.out.println("XXXXXXX group ranking is: "+groupRanking.toString());
+		logConsole(2, "  Group " + historyGroup + " ranking: " + groupRanking.toString());
 		return groupRanking;
 	}
 	
@@ -1445,10 +1427,10 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 					double result = ((DynamicWindowClassificationPerformanceEvaluator) 
 							auxConcept.ConceptLearner.internalWindowEvaluator).getFractionIncorrectlyClassified(0);
 					groupRanking.put(auxConcept.getHistoryIndex(), result);
-					System.out.println("Classifier from group "+historyGroup+" has an err of "+result);
+					logConsole(2, "  Candidate from group " + historyGroup + " (id=" + auxConcept.getHistoryIndex() + ") has err=" + String.format("%.4f", result));
 
 					if (result < minErr){
-						System.out.println("Classifier from group "+historyGroup+" improves min with an err in the ww of "+result);
+						logConsole(2, "  Candidate from group " + historyGroup + " improves min with err=" + String.format("%.4f", result));
 						minErr = result;
 						bestGroup = historyGroup;
 						bestGroupRanking = groupRanking;
@@ -1457,8 +1439,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			}	
 		}
 		assert bestGroup != -1;
-		System.out.println("The best group is: "+bestGroup);
-		System.out.println("XXXXXXX This group's ranking is: "+bestGroupRanking.toString());
+		logConsole(2, "The best group is: " + bestGroup + " with ranking: " + bestGroupRanking.toString());
 		return new GroupRank(bestGroup, bestGroupRanking);
 	}
 	
@@ -1532,62 +1513,51 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 
 	protected boolean activeIsBetterThanBKGbaseClassifier() {
 		// DEBUG
-		System.out.println("[Example " + this.instancesSeen + "] Comparison of classifiers -  WW size: " + this.W.size());
-		System.out.println("ACTIVE: "+((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
+		logConsole(2, "[Example " + this.instancesSeen + "] Comparison of classifiers -  WW size: " + this.W.size());
+		logConsole(2, "ACTIVE: "+((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 			.getFractionIncorrectlyClassified(this.active.indexOriginal));
-		System.out.println("BKG: "+((DynamicWindowClassificationPerformanceEvaluator)
+		logConsole(2, "BKG: "+((DynamicWindowClassificationPerformanceEvaluator)
 				this.active.bkgLearner.internalWindowEvaluator).getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal));
-		System.out.println("activeBetterThanBKGbaseClassifier: "+(((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
+		logConsole(2, "activeBetterThanBKGbaseClassifier: "+(((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 			.getFractionIncorrectlyClassified(this.active.indexOriginal) <= ((DynamicWindowClassificationPerformanceEvaluator)
 			this.active.bkgLearner.internalWindowEvaluator).getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal)));
 		
 		return (((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 			.getFractionIncorrectlyClassified(this.active.indexOriginal) <= ((DynamicWindowClassificationPerformanceEvaluator)
 			this.active.bkgLearner.internalWindowEvaluator).getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal));
-		// this.indexOriginal - pos of this classifier with active warning in ensemble
-		// return ((this.ensemble.evaluator.getFractionIncorrectlyClassified() <= ((DynamicWindowClassificationPerformanceEvaluator)
-		//		this.ensemble.bkgLearner.internalWindowEvaluator).getFractionIncorrectlyClassified(this.ensemble.bkgLearner.indexOriginal)));
 	}
 
 	protected boolean activeIsBetterThanCHbaseClassifier(double bestFromCH) {
 		//DEBUG
-		System.out.println("Comparison on instance: "+this.instancesSeen);
-		System.out.println("ACTIVE: "+((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
+		logConsole(2, "Comparison on instance: "+this.instancesSeen);
+		logConsole(2, "ACTIVE: "+((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 				.getFractionIncorrectlyClassified(this.active.indexOriginal));
-			System.out.println("CH: "+bestFromCH);
-			System.out.println("activeBetterThanCHbaseClassifier: "+(((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
+		logConsole(2, "CH: "+bestFromCH);
+		logConsole(2, "activeBetterThanCHbaseClassifier: "+(((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 					.getFractionIncorrectlyClassified(this.active.indexOriginal) <= bestFromCH));
 		if(((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 				.getFractionIncorrectlyClassified(this.active.indexOriginal) == bestFromCH){
-			System.out.println("IMPORTANT: ACTIVE CLASSIFIER ERR == BEST FROM CH");
+			logConsole(2, "IMPORTANT: ACTIVE CLASSIFIER ERR == BEST FROM CH");
 		}
-		///////////////////// END OF DEBUGGING
 
-		// TODO: RENAME METHOD TO REMOVE THE WORD BETTER, WHICH IS SUBJECTIVE, AND ADD A MORE EXPLICIT NAME WHICH SAYS THAT ERR IS LOWER OR SAME.
 		return (((DynamicWindowClassificationPerformanceEvaluator) this.active.internalWindowEvaluator)
 			.getFractionIncorrectlyClassified(this.active.indexOriginal) <= bestFromCH);
-
-		// this.indexOriginal - pos of this classifier with active warning in ensemble
-		// return (this.ensemble.evaluator.getFractionIncorrectlyClassified() <= bestFromCH); (old comparison)
 	}
 
 	protected boolean CHbaseClassifierIsBetterThanBkg(double bestFromCH) {
 		// DEBUG
-		System.out.println("Comparison on instance: "+this.instancesSeen);
-		System.out.println("BKG: "+((DynamicWindowClassificationPerformanceEvaluator) this.active.bkgLearner.internalWindowEvaluator)
+		logConsole(2, "Comparison on instance: "+this.instancesSeen);
+		logConsole(2, "BKG: "+((DynamicWindowClassificationPerformanceEvaluator) this.active.bkgLearner.internalWindowEvaluator)
 				.getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal));
-		System.out.println("CH: "+bestFromCH);
-		System.out.println("bkgBetterThanCHbaseClassifier: "+(bestFromCH <= ((DynamicWindowClassificationPerformanceEvaluator) this.active.bkgLearner.internalWindowEvaluator)
+		logConsole(2, "CH: "+bestFromCH);
+		logConsole(2, "bkgBetterThanCHbaseClassifier: "+(bestFromCH <= ((DynamicWindowClassificationPerformanceEvaluator) this.active.bkgLearner.internalWindowEvaluator)
 				.getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal)));
 		
 		if (bestFromCH == ((DynamicWindowClassificationPerformanceEvaluator) this.active.bkgLearner.internalWindowEvaluator)
 				.getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal)) {
-			System.out.println("IMPORTANT: BKG CLASSIFIER ERR == BEST FROM CH");
+			logConsole(2, "IMPORTANT: BKG CLASSIFIER ERR == BEST FROM CH");
 		}
-		///////////////////// END OF DEBUGGING
 		
-		// TODO: RENAME METHOD TO REMOVE THE WORD BETTER, WHICH IS SUBJECTIVE, AND ADD A MORE EXPLICIT NAME WHICH SAYS THAT ERR IS LOWER OR SAME.
-		// this.bkgLearner.indexOriginal - pos of bkg classifier if it becomes active in the ensemble (always same pos than the active)
 		return (bestFromCH <= ((DynamicWindowClassificationPerformanceEvaluator) this.active.bkgLearner.internalWindowEvaluator)
 				.getFractionIncorrectlyClassified(this.active.bkgLearner.indexOriginal));
 	}
@@ -1617,9 +1587,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	}
 	
 	public Event prepareDriftDurationEvent(long duration) {
-		System.out.println("#############");
-		System.out.println("Duration of Drift in milliseconds: " + duration);
-		System.out.println("#############");
+		logConsole(2, "Duration of Drift in milliseconds: " + duration);
 
 		String[] eventLog = { String.valueOf(instancesSeen), "Change of duration --- " +duration , String.valueOf(0),
 				String.valueOf(this.active.evaluator.getPerformanceMeasurements()[1].getValue()),
@@ -1642,10 +1610,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	public Event getWarningEvent() {
 
 		// System.out.println();
-		System.out.println("-------------------------------------------------");
-		System.out.println("WARNING ON IN MODEL #"+0+". Warning flag status (activeClassifierPos, Flag): "+CH.getWarnings());
-		System.out.println("CONCEPT HISTORY STATE AT THE MOMENT OF THIS WARNING  IS: "+CH.classifiersKeySet().toString());
-		System.out.println("-------------------------------------------------");
+		logConsole(2, "WARNING ON IN MODEL #0. CH: " + CH.classifiersKeySet().toString());
 		// System.out.println();
 
 		String[] warningLog = { String.valueOf(this.lastWarningOn), "WARNING-START", // event
@@ -1670,7 +1635,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	}
 
 	public Event getBkgDriftEvent() {
-		System.out.println("DRIFT RESET IN MODEL #"+0+" TO NEW BKG MODEL #"+this.active.bkgLearner.indexOriginal);
+		logConsole(1, "DRIFT RESET TO NEW BKG MODEL #" + this.active.bkgLearner.indexOriginal);
 		String[] eventLog = {
 				String.valueOf(this.lastDriftOn), "DRIFT TO BKG MODEL", String.valueOf(0),
 				String.valueOf(this.active.evaluator.getPerformanceMeasurements()[1].getValue()),
@@ -1692,7 +1657,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	
 	
 	public Event getInsertionToCHEvent(int groupId) {
-		System.out.println("INSERTION OF CLASSIFIER'S COPY PRIOR TO WARNING TO GROUP {"+groupId+"} of CH.");
+		logConsole(1, "INSERTION OF CLASSIFIER TO GROUP {" + groupId + "} of CH.");
 		
 		String[] eventLog = {  // TODO: improve the formatting of this log (it's from drift to BKG model + CH.classifiersKeySet)
 				String.valueOf(this.lastDriftOn), "INSERTION TO GROUP {"+groupId+"}", String.valueOf(0),
@@ -1715,7 +1680,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	
 	
 	public Event getRetrievalFromCHEvent(int groupId) {
-		System.out.println("RETRIEVAL OF BEST CLASSIFIER FROM GROUP {"+groupId+"} OF CH TO COMPARE TO ACTIVE AND BKG CLASSIFIERS.");
+		logConsole(1, "RETRIEVAL OF BEST CLASSIFIER FROM GROUP {" + groupId + "} OF CH");
 		
 		String[] eventLog = {  // TODO: improve the formatting of this log (it's from drift to BKG model + CH.classifiersKeySet)
 				String.valueOf(this.lastDriftOn), "RETRIEVAL FROM GROUP {"+groupId+"}", String.valueOf(0),
@@ -1737,9 +1702,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	}
 
 	public Event getRecurringDriftEvent(Integer indexOfBestRankedInCH, int group) {
-		System.out.println(indexOfBestRankedInCH); // TODO: remove after debugging]
-		System.out.println("RECURRING DRIFT RESET IN POSITION #"+0+" TO MODEL #"+
-				CH.get(group).groupList.get(indexOfBestRankedInCH).historyIndex + " FROM GROUP "+group);
+		logConsole(1, "RECURRING DRIFT RESET TO MODEL #" + CH.get(group).groupList.get(indexOfBestRankedInCH).historyIndex + " FROM GROUP " + group);
 		String[] eventLog = { String.valueOf(this.lastDriftOn), "RECURRING DRIFT", String.valueOf(0),
 				String.valueOf(this.active.evaluator.getPerformanceMeasurements()[1].getValue()),
 //				this.warningDetectionMethodOption.getValueAsCLIString().replace("ADWINChangeDetector -a ", ""),
@@ -1775,7 +1738,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		else if (this.topology.getNumberOfPrototypesCreated() < this.minTopologySizeForDriftOption.getValue())
 			msg = "EARLY_DRIFT_2 - NOT ENOUGH PROTOTYPES";
 		
-		System.out.println("FALSE ALARM IN MODEL #"+0);
+		logConsole(1, "FALSE ALARM: " + msg);
 		String[] eventLog = { String.valueOf(this.lastDriftOn), msg,
 				String.valueOf(0),
 				String.valueOf(this.active.evaluator.getPerformanceMeasurements()[1].getValue()),
@@ -1928,9 +1891,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		 *			  Its history ID will be the last one in the history (= size)
 		 */
 		public void reset() {
-			System.out.println("-------------------------------------------------");
-			System.out.println("RESET (WARNING OFF) IN MODEL #"+this.indexOriginal+
-					". Warning flag status (activeClassifierPos, Flag): "+CH.getNumberOfActiveWarnings());
+			logConsole(2, "RESET (WARNING OFF) IN MODEL #" + this.indexOriginal + ". Active warnings: " + CH.getNumberOfActiveWarnings());
 			// System.out.println("-------------------------------------------------");
 			this.weight = 1.0;			
 			this.instancesTrained = 0;
@@ -2027,8 +1988,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			// 2 Resets the evaluator
 			BasicClassificationPerformanceEvaluator bkgEvaluator = (BasicClassificationPerformanceEvaluator) this.evaluator.copy();
 			bkgEvaluator.reset();
-			System.out.println("------------------------------");
-			System.out.println("Create estimator for BKG classifier in position: " + this.indexOriginal);
+			logConsole(2, "Create estimator for BKG classifier in position: " + this.indexOriginal);
 			
 			// Add also an internal evaluator (window) in the bkgEvaluator
 			DynamicWindowClassificationPerformanceEvaluator bkgInternalWindowEvaluator = null;
@@ -2040,7 +2000,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 						this.indexOriginal, "created for BKG classifier in ensembleIndex #" + this.indexOriginal);
 				bkgInternalWindowEvaluator.setEvaluatorType("BKG");  // for debugging
 				bkgInternalWindowEvaluator.reset();
-			} System.out.println("------------------------------");
+			}
 
 			// 4 Create a new bkgLearner object
 			this.bkgLearner = new NABaseLearner(this.indexOriginal, bkgClassifier, 
@@ -2070,10 +2030,9 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 					(BasicClassificationPerformanceEvaluator) this.evaluator.copy(), this.createdOn, this.useDriftDetector,
 					true, useRecurringLearner, true, this.windowProperties.copy(), null, this.timesUsed, this.cumInstTrained);
 			// step 3
-			System.out.println("<><><><><>");
-			System.out.println("Created TMP copy of active classifier when it had been trained with " + tmpConcept.cumInstTrained + " examples");
+			logConsole(2, "Created TMP copy of active classifier when trained with " + tmpConcept.cumInstTrained + " examples");
 			this.tmpCopyOfClassifier = new Concept(tmpConcept, this.createdOn,
-					this.evaluator.getPerformanceMeasurements()[0].getValue(), instancesSeen);   // IMP: It saves the acumulated error
+					this.evaluator.getPerformanceMeasurements()[0].getValue(), instancesSeen);   // IMP: It saves the acummulated error
 			this.tmpCopyOfClassifier.setErrorBeforeWarning(this.lastError);
 		}
 		
@@ -2232,7 +2191,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		}
 		
 		public Topology(Integer[] topologyAttributeSubset, boolean trainsOnline) {
-			System.out.println("Creating topology container without learner.");
+			logConsole(2, "Creating topology container without learner.");
 			this.learner = null;
 			this.trainsOnline = trainsOnline;
 			this.id = (int) (Math.random() * 1000000);
@@ -2278,17 +2237,12 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		}
 		
 		public void trainFromBuffer() {
-			System.out.println("THE BUFFER HAS " + this.offlineTrainingBuffer.size() + " INSTANCES.");
+			logConsole(2, "THE BUFFER HAS " + this.offlineTrainingBuffer.size() + " INSTANCES.");
 			for (int i = 0; i < this.offlineTrainingBuffer.size(); i++) {
-//				if (i%100 == 0) System.out.println(i);
 				this.learner.trainOnInstanceImpl(this.offlineTrainingBuffer.get(i));
-			} System.out.println("Trained with " + this.offlineTrainingBuffer.size() + " examples");
+			}
+			logConsole(2, "Trained with " + this.offlineTrainingBuffer.size() + " examples");
 			this.offlineTrainingBuffer = new ArrayList<Instance>();
-			System.out.println("Now there are " + this.offlineTrainingBuffer.size() + " examples");
-			System.out.println("===========");
-			System.out.println("==888888888888=");
-			System.out.println("===========");
-			System.out.println("===========");
 		}
 	
 		protected int getNumberOfPrototypesCreated() {
@@ -2595,7 +2549,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 				for (int historyGroup : history.keySet()) { // TODO: see in method decreaseNumberOfWarnings
 					for (Concept learner : history.get(historyGroup).groupList.values()) {
 						if (learner.getInternalEvaluator() != null) { // Step 2
-							System.out.println("ADDING VALUES TO INTERNAL EVALUATOR OF CONCEPT "+learner.historyIndex+" IN POS "+ePos.indexOriginal);
+							logConsole(2, "ADDING VALUES TO INTERNAL EVALUATOR OF CONCEPT "+learner.historyIndex+" IN POS "+ePos.indexOriginal);
 							learner.addModelToInternalEvaluator(ensemblePos, lastError, ePW.windowSize);
 
 						} else { // Step 3: Otherwise, initialize a new internal evaluator for the concept
@@ -2674,15 +2628,9 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 //				System.out.println(w1.classIndex());
 			}
 			
-			// asuarez: Debugging groups
-			System.out.println();
-			System.out.println("There were " + w1.numInstances() + " examples or prototypes for comparison to the CH topologies.");
-			System.out.println("There are " + this.history.size() + " groups.");
+			logConsole(2, "There were " + w1.numInstances() + " examples or prototypes for comparison to the CH topologies. There are " + this.history.size() + " groups.");
 			
 			for (Group g : this.history.values()) {
-				System.out.println("+++++++");
-				// Mahalanobis will consider classes as any other attribute for the distances 
-				// Euclidean will in computeDistances(), but it may not in LinearNNSearch. TODO: check and fix if required
 				if (this.distanceMetric.equals("Euclidean")) {
 					dist = getMeanDistanceToNN(w1, g.getTopologyPrototypes()); 
 				} else if (this.distanceMetric.equals("Mahalanobis")) {
@@ -2690,56 +2638,30 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 						dist = this.m_dist.distance(w1, g.getTopologyPrototypes());
 					} else {
 						SamoaToWekaInstanceConverter converter = new SamoaToWekaInstanceConverter();
-						MahalanobisDistance m = new MahalanobisDistance();  // TODO: move this up
+						MahalanobisDistance m = new MahalanobisDistance();
 						dist = m.distance(converter.wekaInstances(w1), 
 									      converter.wekaInstances(g.getTopologyPrototypes()));
-					} // Debugging
-					System.out.printf("Mahalanobis distance between matrices A nd B is %.3f", dist);
-					System.out.println();
-
-				} else {
-					System.out.println("Please, specify a distance metric for concept similarity.");
+					}
+					logConsole(2, String.format("Mahalanobis distance between matrices is %.4f", dist));
 				}
-				
-				System.out.println("insert? " + (dist < this.maxDistanceThreshold));
-				System.out.println("min? " + (dist < min) );
-				System.out.println("MC? " + mc);
+				logConsole(2, "  Group " + g.getID() + " distance: " + String.format("%.4f", dist) + " (prototypes=" + g.getTopologyPrototypes().numInstances() + ", classifiers=" + g.groupList.size() + ")");
 
 				if ((dist < this.maxDistanceThreshold) & ((dist < min) || mc)) {
-					// groupsDistance should not be large in size. Thus, it should not be required to create a new arraylist each time.
-					if (!mc) groupsDistance.clear(); // for insertions, and for retrievals if multi-cluster option is not enabled, only allow 1 group at a time.
+					if (!mc) groupsDistance.clear();
 					min = dist;
 					groupsDistance.put(dist, g.getID());
-					System.out.println("Adding group: "+g.getID());
 				}
-				System.out.println("new size grouphashmap: "+groupsDistance.size());
-				System.out.println("Distance of instances in W to group "+g.getID()+" is "+dist);
-				System.out.println("Learner ID: "+g.getConceptCluster().getLearnerId());
-				System.out.println(g.getTopologyPrototypes().numInstances()+" prototypes in group "+g.getID());
-				System.out.println("Number of historical classifiers in the group: "+g.groupList.size());
-				System.out.println("++++++");
 			} 
 			ArrayList<Integer> groups = null;
 			if (groupsDistance.size() <= 1)  groups = new ArrayList<>(groupsDistance.values());
 			else groups = new ArrayList<>(new TreeMap<Double, Integer>(groupsDistance).values());
 			
-			System.out.println("all info is: "+groupsDistance.toString());
-			System.out.println("The groups inside the dist thresh (in asc order by distance) are: " + groups.toString());
-			if (groups.size() > 0) assert groupsDistance.get(min) == groups.get(0);  // make sure that the output is ordered by dist
-			
-			// Add a pos with -1 if empty, to signal a failed retrieval (so the legacy code does not break)
 			if (groups.size() == 0) groups.add(-1);
-			assert mc | groups.size() == 1;  // if mc enabled, there will be 1-n groups. otherwise just one (-1 if none)
-			assert ((groups.get(0) == -1) && (groups.size() == 1)) | (groups.get(0) >= 0); // if no groups found in the interval, the size of the array should be 1.
+			assert mc | groups.size() == 1;
+			assert ((groups.get(0) == -1) && (groups.size() == 1)) | (groups.get(0) >= 0);
 			
-			if (groups.get(0) == -1) System.out.println("No groups selected as the min distance is "+min+" and the maximum dist allowed is: "+this.maxDistanceThreshold);
-			else System.out.println("The selected groups before Concept Similarity (comparing accuracy for the warning window) are: "+groups.toString());
-			if (min < this.maxDistanceThreshold) {
-				System.out.println("The selected groups before Concept Similarity (comparing accuracy for the warning window) are: "+groups.toString());
-			} else {
-				System.out.println("No groups selected as the min distance is "+min+
-						" and the maximum dist allowed is: "+this.maxDistanceThreshold);				
-			} return groups;
+			logConsole(1, "FindGroup: min_dist=" + String.format("%.4f", min) + " (threshold sigma=" + this.maxDistanceThreshold + ") -> Matched Group: " + (groups.get(0) != -1 ? groups.get(0) : "None"));
+			return groups;
 		}
 		
 		/**
@@ -2843,19 +2765,17 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		
 		/** This method trains a set of examples over a classifier in the concept history*/
 		public void trainGroupLearner(int groupID, int classifierID, ArrayList<Instance> conceptBuffer) {
-			System.out.println(":::::::::::::::::::::::::::");
-			System.out.println("inst Trained before buffer:" + this.history.get(groupID).getConcept(classifierID).getBaseLearner().instancesTrained);
+			logConsole(2, "inst Trained before buffer:" + this.history.get(groupID).getConcept(classifierID).getBaseLearner().instancesTrained);
 			Concept cnpt = this.history.get(groupID).getConcept(classifierID);
 			for (int i = 0; i < conceptBuffer.size(); i++) {
 				cnpt.getBaseLearner().trainOnInstance(conceptBuffer.get(i), false);
 			} 
-			System.out.println("Internal concept buffer CH was: "+cnpt.getBaseLearner().conceptBuffer.size());
+			logConsole(2, "Internal concept buffer CH was: "+cnpt.getBaseLearner().conceptBuffer.size());
 			cnpt.getBaseLearner().resetConceptBuffer();
-			System.out.println("Internal concept buffer CH now is: "+cnpt.getBaseLearner().conceptBuffer.size());
+			logConsole(2, "Internal concept buffer CH now is: "+cnpt.getBaseLearner().conceptBuffer.size());
 			cnpt = null;
 			conceptBuffer = new ArrayList<Instance>();
-			System.out.println("inst Trained after buffer:" + this.history.get(groupID).getConcept(classifierID).getBaseLearner().instancesTrained);
-			System.out.println(":::::::::::::::::::::::::::");
+			logConsole(2, "inst Trained after buffer:" + this.history.get(groupID).getConcept(classifierID).getBaseLearner().instancesTrained);
 		}
 		
 		public void removeLearnerFromGroup(int groupID, Integer learnerID) {
@@ -2886,15 +2806,14 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		}
 		
 		public HashMap<Integer, Double> getConceptAgesFromGroupSubset(int groupID, ArrayList<Integer> subset){
-			System.out.println("Subset of classfiers is: " + subset.toString());
+			logConsole(2, "Subset of classfiers is: " + subset.toString());
 			HashMap<Integer, Double> conceptAgesMapping = new HashMap<Integer, Double>();
 			for (int key: this.get(groupID).keys()) {
 				if (subset.contains(key)) {
 					conceptAgesMapping.put(key, (double) this.get(groupID).getConcept(key).getCreatedOn());
 				}
 			} 
-			System.out.println("Ages (createdOn) Mapping for a subset of classifiers");
-			System.out.println(conceptAgesMapping.toString());
+			logConsole(2, "Ages (createdOn) Mapping for a subset of classifiers: " + conceptAgesMapping.toString());
 			return conceptAgesMapping;
 		}
 		
@@ -2933,15 +2852,14 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		}
 		
 		public HashMap<Integer, Double> getConceptLastTimeUsedFromGroupSubset(int groupID, ArrayList<Integer> subset){
-			System.out.println("Subset of classfiers is: " + subset.toString());
+			logConsole(2, "Subset of classfiers is: " + subset.toString());
 			HashMap<Integer, Double> conceptLastTimeUsed = new HashMap<Integer, Double>();
 			for (int key: this.get(groupID).keys()) {
 				if (subset.contains(key)) {
 					conceptLastTimeUsed.put(key, (double) this.get(groupID).getConcept(key).instancesSeen);
 				}
 			} 
-			System.out.println("Last Time Reused (instancesSeen) Mapping");
-			System.out.println(conceptLastTimeUsed.toString());
+			logConsole(2, "Last Time Reused (instancesSeen) Mapping: " + conceptLastTimeUsed.toString());
 			return conceptLastTimeUsed;
 		}				
 	}
