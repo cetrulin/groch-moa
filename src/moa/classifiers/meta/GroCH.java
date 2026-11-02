@@ -1917,7 +1917,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 				this.classifier = this.bkgLearner.classifier;
 				this.evaluator = this.bkgLearner.evaluator;
 				this.createdOn = this.bkgLearner.createdOn;
-				this.timesUsed = ++this.bkgLearner.timesUsed;
+				this.timesUsed = 0;
 				this.cumInstTrained = this.bkgLearner.cumInstTrained;
 				this.bkgLearner = null;
 				this.internalWindowEvaluator = null;
@@ -2028,7 +2028,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			// step 2
 			NABaseLearner tmpConcept = new NABaseLearner(this.indexOriginal, this.classifier.copy(),
 					(BasicClassificationPerformanceEvaluator) this.evaluator.copy(), this.createdOn, this.useDriftDetector,
-					true, useRecurringLearner, true, this.windowProperties.copy(), null, this.timesUsed, this.cumInstTrained);
+					true, useRecurringLearner, true, this.windowProperties.copy(), null, 0, this.cumInstTrained);
 			// step 3
 			logConsole(2, "Created TMP copy of active classifier when trained with " + tmpConcept.cumInstTrained + " examples");
 			this.tmpCopyOfClassifier = new Concept(tmpConcept, this.createdOn,
@@ -2325,6 +2325,17 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	    			cloned.setLearner(cloned.getLearner().clone());
 	    		else if(cloned.getBuffer() != null && cloned.getNumberOfPrototypesCreated() > 0) 
 	    			cloned.setBuffer(cloned.getBuffer());
+	    		if (this.auxInst != null) {
+	    			cloned.auxInst = (Instance) this.auxInst.copy();
+	    		}
+	    		if (this.offlineTrainingBuffer != null) {
+	    			cloned.offlineTrainingBuffer = new ArrayList<Instance>(this.offlineTrainingBuffer.size());
+	    			for (Instance inst : this.offlineTrainingBuffer) {
+	    				cloned.offlineTrainingBuffer.add((Instance) inst.copy());
+	    			}
+	    		} else {
+	    			cloned.offlineTrainingBuffer = new ArrayList<Instance>();
+	    		}
 	    		return cloned;
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
@@ -2361,7 +2372,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 					v_val[j] = inst.classValue();
 					v_att[j] = inst.classAttribute();
 				}
-			} inst = new InstanceImpl(1, v_val, v_pos, v_pos.length); // @author: asuarez: parece que esta es la forma de hacerlo...
+			} inst = new InstanceImpl(1, v_val, v_pos, v_pos.length); // @author: asuarez: seems like this is the way to do it...
 			
 			// 2. Modify headers of dataset (TODO: do this only once and send the dataset each time an object is created, or/and to the CH once) 
 			if (this.subsetHeaders == null) {
@@ -2403,10 +2414,11 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 
 		public NABaseLearner copyConcept(int key) {
 			NABaseLearner orig = this.groupList.get(key).getBaseLearner();
+			orig.timesUsed++;
 			NABaseLearner aux = new NABaseLearner(orig.indexOriginal, orig.classifier.copy(),
 					(BasicClassificationPerformanceEvaluator) orig.evaluator.copy(), orig.createdOn, orig.useDriftDetector,
 					orig.isBackgroundLearner, orig.useRecurringLearner, orig.isOldLearner,
-					orig.windowProperties != null ? orig.windowProperties.copy() : null, null, orig.timesUsed, orig.cumInstTrained);
+					orig.windowProperties != null ? orig.windowProperties.copy() : null, null, 0, orig.cumInstTrained);
 			return aux;
 		}
 
