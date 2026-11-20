@@ -113,7 +113,8 @@ public class GUnit implements Cloneable {
 		for (int i = 0;i<this.neighbors.size();i++){
 			GEdge c = this.neighbors.get(i);
 			if(c.age>=age){
-				this.neighbors.remove(c);
+				this.neighbors.remove(i);
+				i--;
 				if(c.p0.equals(this)){
 					c.p1.neighbors.remove(c);
 				} else {
@@ -125,10 +126,19 @@ public class GUnit implements Cloneable {
 	
 	public void removeNeighbor(GUnit p){
 		for (int i = 0 ; i<this.neighbors.size();i++) {
-			if(this.neighbors.get(i).p0.equals(p) || this.neighbors.get(i).p1.equals(p)) 
-				this.neighbors.remove(this.neighbors.get(i));
+			GEdge c = this.neighbors.get(i);
+			if(c.p0.equals(p) || c.p1.equals(p)) {
+				this.neighbors.remove(i);
+				i--;
+			}
 		}
-			
+		for (int i = 0 ; i<p.neighbors.size();i++) {
+			GEdge c = p.neighbors.get(i);
+			if(c.p0.equals(this) || c.p1.equals(this)) {
+				p.neighbors.remove(i);
+				i--;
+			}
+		}
 	}
 	
 	public GUnit[] getNeighborhood(){
