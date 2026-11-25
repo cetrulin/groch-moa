@@ -105,6 +105,7 @@ Data preprocessing and synthetic stream generators used in the thesis: [Quant-Qu
 | `v1.0.0-moa2017.06` | MOA 2017.06 | Bit-exact Fritzke (1995) optimizations, `ConceptDistance`/`DriftEventLogger`, `moa.clusterers.gng`, JUnit tests, Apache 2.0 |
 | `v2.0.0-moa2024.07` | MOA 2024.07 | `CapabilitiesHandler`, `long measureByteSize()`, self-contained `PerGroupMahalanobisDistance`, self-contained JUnit tests |
 | `v3.0.0-capymoa` | MOA 2024.07 + CapyMOA | `NA` renamed to `GroCH`, `scripts/build_moa_jar.sh`, CapyMOA `GroCH` wrapper & pytest suite |
+| `v3.1.0-capymoa` | MOA 2024.07 + CapyMOA | GitHub Actions CI, `CITATION.cff`, Mermaid workflow diagram, parameterized `experiments/run_groch.sh` & SLURM runner, streamlined docs |
 
 ## Citation
 
