@@ -1,5 +1,5 @@
 #!/bin/bash -l
-# see my jobs: squeue -u asuarezcet  / cancel a job: scancel <jobid>
+# see my jobs: squeue -u $USER  / cancel a job: scancel <jobid>
 # ls -l|awk '$8 ~ /..:../{gsub($8,"2020")}1'|awk '{A[$7" "$6" "$8]++}END{for (i in A){print i" "A[i]}}' # count of files by date in a dir
 # find . -maxdepth 1 -type f -printf '%TY-%Tm-%Td Hour:%TH\n' | awk '{array[$0]+=1}END{ for(val in array) print val" "array[val]   }'  # including Hour
 #
@@ -21,10 +21,10 @@
 ############SBATCH -t 48:00:00
 #
 # E-mail address of recipient
-#SBATCH --mail-user=100080038@alumnos.uc3m.es
+# #SBATCH --mail-user=your.email@example.com
 #
 # Specifies the jobname
-#SBATCH --output=/home/people/asuarezcet/job_outputs/final_SPY_%J.txt
+#SBATCH --output=$HOME/job_outputs/final_SPY_%J.txt
 #
 
 # Dataset
