@@ -19,6 +19,8 @@ import java.io.File;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import moa.capabilities.CapabilitiesHandler;
+import moa.capabilities.ImmutableCapabilities;
 import moa.streams.generators.SEAGenerator;
 
 /**
@@ -78,6 +80,15 @@ public class NATest extends TestCase {
         learner.numberOfMatricesOption.setChosenIndex(0);
         learner.consoleLogLevelOption.setValue(0);
         runStreamSmoke(learner, 1500);
+    }
+
+    public void testCapabilitiesHandlerAndMeasureByteSize() {
+        NA learner = new NA();
+        assertTrue("NA must implement CapabilitiesHandler", learner instanceof CapabilitiesHandler);
+        ImmutableCapabilities caps = learner.defineImmutableCapabilities();
+        assertNotNull("defineImmutableCapabilities must not return null", caps);
+        long size = learner.measureByteSize();
+        assertTrue("measureByteSize must return a valid long >= -1L", size >= -1L);
     }
 
     public static Test suite() {
