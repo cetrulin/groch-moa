@@ -72,18 +72,19 @@ public class GUnit implements Cloneable {
 	}
 		
 	public static int getNumberOfGPrototypes(ArrayList<GUnit> list){
-		int n = 0;
-		for (GUnit p: list) n++;
-		return n;
+		return list.size();
 	}
 	
-	public static double dist(double w1[],double w2[]){
+	public static double distSquared(double w1[], double w2[]){
 		double sum = 0;
-		//System.out.println(w1.length+" "+w2.length);  // debug
 		for (int i = 0; i < w1.length; i++) {
 			sum += Math.pow(w1[i]-w2[i],2);
 		}
-		return Math.sqrt(sum);
+		return sum;
+	}
+
+	public static double dist(double w1[],double w2[]){
+		return Math.sqrt(distSquared(w1, w2));
 	}
 	
 	public void addNeighbor(GUnit s2){
@@ -110,9 +111,15 @@ public class GUnit implements Cloneable {
 	}
 	
 	public void purgueGEdges(double age){
+		purgueGEdgesAndCheck(age);
+	}
+
+	public boolean purgueGEdgesAndCheck(double age){
+		boolean removedAny = false;
 		for (int i = 0;i<this.neighbors.size();i++){
 			GEdge c = this.neighbors.get(i);
 			if(c.age>=age){
+				removedAny = true;
 				this.neighbors.remove(i);
 				i--;
 				if(c.p0.equals(this)){
@@ -122,6 +129,7 @@ public class GUnit implements Cloneable {
 				}
 			}
 		}
+		return removedAny;
 	}
 	
 	public void removeNeighbor(GUnit p){

@@ -63,6 +63,11 @@ public class MahalanobisDistanceSingleMatrix {
     private Instances subsetHeaders;
     private Attribute[] subsetAttributes;
     Instance auxInst;
+    private double[][] invCovar;
+    private double[][] invCovarT;
+    private double cachedDet;
+    private double cachedDetFactor;
+    private int dim;
     
     public MahalanobisDistanceSingleMatrix(String [] matrixDatasetsPath) {
         if(matrixDatasetsPath[0] != "-1") {
@@ -75,6 +80,7 @@ public class MahalanobisDistanceSingleMatrix {
                     mergedDataset.add(datasets[i].get(j));
                 }
             } this.covarMatrix = new Array2DRowRealMatrix(MatrixUtils.calculateCovariance(getFeaturesAsMatrix(mergedDataset)));
+            initPrecomputedMatrix();
             
         } else System.out.println("WARNING! NO DATASETS SPECIFIED TO INITIALIZE THE MAHALANOBIS MATRIX. "
                     + "THIS SHOULD CRASH SOON.");
@@ -98,6 +104,7 @@ public class MahalanobisDistanceSingleMatrix {
             mergedDataset.setClassIndex(mergedDataset.get(0).numAttributes() - 1);
             
             this.covarMatrix = new Array2DRowRealMatrix(MatrixUtils.calculateCovariance(getFeaturesAsMatrix(mergedDataset)));
+            initPrecomputedMatrix();
             
         } else System.out.println("WARNING! NO DATASETS SPECIFIED TO INITIALIZE THE MAHALANOBIS MATRIX. "
                     + "THIS SHOULD CRASH SOON.");		}
@@ -207,47 +214,101 @@ public class MahalanobisDistanceSingleMatrix {
     	return this.auxInst = inst.copy();	
     }
     
+    private void initPrecomputedMatrix() {
+        if (this.covarMatrix != null) {
+            LUDecomposition lu = new LUDecomposition(this.covarMatrix);
+            this.cachedDet = lu.getDeterminant();
+            this.invCovar = lu.getSolver().getInverse().getData();
+            this.dim = this.covarMatrix.getRowDimension();
+            this.cachedDetFactor = Math.pow(this.cachedDet, 1 / this.dim);
+            this.invCovarT = new double[this.dim][this.dim];
+            for (int r = 0; r < this.dim; r++) {
+                for (int c = 0; c < this.dim; c++) {
+                    this.invCovarT[c][r] = this.invCovar[r][c];
+                }
+            }
+        }
+    }
+
     public double distance(double [] v1, double [] v2) {
-		Instance v1Instance = null;
-		Instance v2Instance = null;
-		v1Instance = (Instance) this.auxInst.copy();
-		v2Instance = (Instance) this.auxInst.copy();
-		for (int j = 0; j < v1.length; j++) v1Instance.setValue(j, v1[j]);	
-		for (int j = 0; j < v2.length; j++) v2Instance.setValue(j, v2[j]);
-		return distance(v1Instance, v2Instance);
+        return distance(v1, v2, new double[v1.length]);
     }
-    
+
+    public double distanceSquared(double[] v1, double[] v2, double[] scratch) {
+        final int d = v1.length;
+        final double df = (d == this.dim) ? this.cachedDetFactor : Math.pow(this.cachedDet, 1 / d);
+        if (df == 1.0) {
+            for (int i = 0; i < d; i++) {
+                scratch[i] = v1[i] - v2[i];
+            }
+        } else {
+            for (int i = 0; i < d; i++) {
+                scratch[i] = (v1[i] - v2[i]) * df;
+            }
+        }
+        final double[][] invT = this.invCovarT;
+        double sum = 0.0;
+        for (int c = 0; c < d; c++) {
+            final double[] col = invT[c];
+            double acc = 0.0;
+            for (int r = 0; r < d; r++) {
+                acc += scratch[r] * col[r];
+            }
+            sum += acc * scratch[c];
+        }
+        return sum;
+    }
+
+    public double distance(double[] v1, double[] v2, double[] scratch) {
+        return Math.sqrt(distanceSquared(v1, v2, scratch));
+    }
+
     public double distance(Instance v1, Instance v2) {
-        // d (Mahalanobis) = [(xB – xA)T * C -1 * (xB – xA)]^0.5   (LUDecomposition replaces here the inverse)
-        double det = Math.pow((new LUDecomposition(this.covarMatrix).getDeterminant()), 1/(v1.numAttributes()));
-        double[] tempSub = new double[v1.numAttributes()];
-        for(int i=0; i < v1.numAttributes(); i++){
-            tempSub[i] = (v1.value(i)-v2.value(i));
-//				System.out.println(i+": value v1 --> "+v1.value(i)+"   value v2:"+v2.value(i)); test
+        final int d = v1.numAttributes();
+        final double df = (d == this.dim) ? this.cachedDetFactor : Math.pow(this.cachedDet, 1 / d);
+        final double[][] invT = this.invCovarT;
+        double[] temp = new double[d];
+        if (df == 1.0) {
+            for (int i = 0; i < d; i++) {
+                temp[i] = v1.value(i) - v2.value(i);
+            }
+        } else {
+            for (int i = 0; i < d; i++) {
+                temp[i] = (v1.value(i) - v2.value(i)) * df;
+            }
         }
-        double[] temp = new double[v1.numAttributes()];
-        for(int i=0; i < temp.length; i++){
-            temp[i] = tempSub[i]*det;
+        double sum = 0.0;
+        for (int c = 0; c < d; c++) {
+            final double[] col = invT[c];
+            double acc = 0.0;
+            for (int r = 0; r < d; r++) {
+                acc += temp[r] * col[r];
+            }
+            sum += acc * temp[c];
         }
-        RealMatrix m2 = new Array2DRowRealMatrix(new double[][] {temp});
-        RealMatrix m3 = m2.multiply(new LUDecomposition(this.covarMatrix).getSolver().getInverse());
-        RealMatrix m4 = m3.multiply((new Array2DRowRealMatrix(new double[][] {temp})).transpose());
-        return Math.sqrt(m4.getEntry(0, 0));
+        return Math.sqrt(sum);
     }
-    
+
     public double distance(Instances a, Instances b) {
-        double [] dist = new double[a.numInstances()];
+        return distance(getFeaturesAsMatrix(a), getFeaturesAsMatrix(b));
+    }
+
+    public double distance(double[][] aData, double[][] bData) {
+        final int m = aData.length;
+        final int n = bData.length;
+        if (m == 0) return Double.NaN;
+        final int d = aData[0].length;
+        final double[] scratch = new double[d];
         double totalDist = 0.0;
-        for (int i = 0; i < a.numInstances(); i++) {
-            // Record distance from each data point to the nearest prototype (Single-link)
-            double minDist = Double.MAX_VALUE;
-            for (int j = 0; j < b.numInstances(); j++) {
-                double d = distance(a.get(i), b.get(j));
-                if (j == 0 || d < minDist) minDist = d;
-            } dist[i] = minDist;
-        } 
-        // Return average distance
-        for (int i = 0; i < dist.length; i++)  totalDist += dist[i];
-        return totalDist / dist.length;
+        for (int i = 0; i < m; i++) {
+            final double[] ai = aData[i];
+            double minDistSq = Double.MAX_VALUE;
+            for (int j = 0; j < n; j++) {
+                double distSq = distanceSquared(ai, bData[j], scratch);
+                if (j == 0 || distSq < minDistSq) minDistSq = distSq;
+            }
+            totalDist += Math.sqrt(minDistSq);
+        }
+        return totalDist / m;
     }
 }

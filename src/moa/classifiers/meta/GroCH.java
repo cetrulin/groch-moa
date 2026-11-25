@@ -351,8 +351,25 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	// All other modules also are orchestrated from here.
 	// -----------------------------------
 	
+	private int cachedByteSize = -1;
+	private long lastByteSizeMeasuredAt = -1;
+	private boolean byteSizeDirty = true;
+
+	@Override
+	public int measureByteSize() {
+		if (this.lastByteSizeMeasuredAt < 0 || this.byteSizeDirty || (this.instancesSeen - this.lastByteSizeMeasuredAt) >= 10000) {
+			this.cachedByteSize = super.measureByteSize();
+			this.lastByteSizeMeasuredAt = this.instancesSeen;
+			this.byteSizeDirty = false;
+		}
+		return this.cachedByteSize;
+	}
+
 	@Override
 	public void resetLearningImpl() {
+		this.cachedByteSize = -1;
+		this.lastByteSizeMeasuredAt = -1;
+		this.byteSizeDirty = true;
 		
 		// Reset attributes
 		this.active = null;
@@ -1091,6 +1108,7 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 	}
 
 	protected void insertionAndDrift(ConceptDrift switchInfo, boolean insert) {
+		this.byteSizeDirty = true;
 		if (insert) insertConceptToCH(switchInfo);  // Insertion in CH (Lines 23-26) 
 		this.active.reset(); // reset base classifier and transition to bkg or recurring learner (step 3)
 		
@@ -2170,6 +2188,9 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			} else this.useAttributeSubset = false;
 			this.useMahalanobisObj = true;
 			this.learner.setMahalanobisDistObj(m_dist); // the underlying learner needs to implement this method
+			if (trainsOnline && !GroCH.this.multiPassTopologyTrainingOption.isSet()) {
+				this.learner.setKeepReceivedPatterns(false);
+			}
 		}
 		
 		public void trainUntilFulfillingStoppingCriteria() {
@@ -2430,6 +2451,13 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 		public Instances getTopologyPrototypes() {
 			return this.conceptCluster.getPrototypes(); // these instances don't belong to a class (unsupervised)
 		}
+
+		public double[][] getTopologyPrototypeWeights() {
+			if (this.conceptCluster.getLearner() != null) {
+				return this.conceptCluster.getLearner().getPrototypeWeights();
+			}
+			return null;
+		}
 		
 		public void setConceptCluster(Topology topology2) {
 			this.conceptCluster = topology2;
@@ -2641,13 +2669,19 @@ public class GroCH extends DriftDetectionMethodClassifierExt {
 			}
 			
 			logConsole(2, "There were " + w1.numInstances() + " examples or prototypes for comparison to the CH topologies. There are " + this.history.size() + " groups.");
+			double[][] w1Matrix = (this.distanceMetric.equals("Mahalanobis") && this.computeSingleMatrix) ? this.m_dist.getFeaturesAsMatrix(w1) : null;
 			
 			for (Group g : this.history.values()) {
 				if (this.distanceMetric.equals("Euclidean")) {
 					dist = getMeanDistanceToNN(w1, g.getTopologyPrototypes()); 
 				} else if (this.distanceMetric.equals("Mahalanobis")) {
 					if (this.computeSingleMatrix) {
-						dist = this.m_dist.distance(w1, g.getTopologyPrototypes());
+						double[][] bWeights = g.getTopologyPrototypeWeights();
+						if (bWeights != null) {
+							dist = this.m_dist.distance(w1Matrix, bWeights);
+						} else {
+							dist = this.m_dist.distance(w1, g.getTopologyPrototypes());
+						}
 					} else {
 						SamoaToWekaInstanceConverter converter = new SamoaToWekaInstanceConverter();
 						MahalanobisDistance m = new MahalanobisDistance();

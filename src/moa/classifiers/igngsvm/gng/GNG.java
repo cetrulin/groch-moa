@@ -54,6 +54,21 @@ public class GNG extends AbstractClusterer implements Cloneable {
 	public MahalanobisDistanceSingleMatrix distObj;
 	public boolean useMahalanobisDistances;
 	public Instance auxInst;
+	private double lastNearestDist;
+	private double[] distScratch;
+	private boolean keepReceivedPatterns = true;
+
+	public void setKeepReceivedPatterns(boolean keep) {
+		this.keepReceivedPatterns = keep;
+	}
+
+	public double[][] getPrototypeWeights() {
+		double[][] weights = new double[this.S.size()][];
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] = this.S.get(i).w;
+		}
+		return weights;
+	}
 	
 	public GNG() {
 		this.id = (int) (Math.random() * 1000);
@@ -191,7 +206,7 @@ public class GNG extends AbstractClusterer implements Cloneable {
 		this.instancesSeen++;
 		// System.out.println("Patterns in GNG: "+instancesSeen);
 
-		this.receivedPatterns.add(pattern);
+		if (this.keepReceivedPatterns) this.receivedPatterns.add(pattern);
 		
 		if(GUnit.getNumberOfGPrototypes(this.S) < 2){			
 			// Saving only a single class = 0
@@ -211,13 +226,16 @@ public class GNG extends AbstractClusterer implements Cloneable {
 			s1.updateAges(); 
 			
 			// 4. Update local error in s1	
-			s1.setError(s1.getError() + distance(s1.w.clone(), pattern));	
+			s1.setError(s1.getError() + this.lastNearestDist);	
 			
 			//5. Move s1 and its neighbors using EpsilonB & EpsilonN
 			s1.updateW(this.BepsilonOption.getValue(), pattern);
-			GUnit neighbors[] = s1.getNeighborhood();
-			for (int j = 0; j < neighbors.length; j++) {
-				neighbors[j].updateW(this.NepsilonOption.getValue(), pattern);
+			final double nepsilon = this.NepsilonOption.getValue();
+			final int nSize = s1.neighbors.size();
+			for (int j = 0; j < nSize; j++) {
+				GEdge edge = s1.neighbors.get(j);
+				GUnit nb = (edge.p0 != s1) ? edge.p0 : edge.p1;
+				nb.updateW(nepsilon, pattern);
 			}						
 						
 			// 6. Reset connections between s1 y s2 (add new edges and update current ones)
@@ -226,11 +244,12 @@ public class GNG extends AbstractClusterer implements Cloneable {
 			else c.age=0;
 			
 			// 7. Delete the edge when its age is greater than the max allowed and after, units without edges	
-			s1.purgueGEdges(this.maxAgeOption.getValue());			
-			for (int k = 0; k < S.size(); k++) {
-				if(this.S.get(k).neighbors.size()==0){
-					this.S.remove(k);
-					--k;
+			if (s1.purgueGEdgesAndCheck(this.maxAgeOption.getValue())) {
+				for (int k = 0; k < S.size(); k++) {
+					if(this.S.get(k).neighbors.size()==0){
+						this.S.remove(k);
+						--k;
+					}
 				}
 			}
 			
@@ -335,25 +354,37 @@ public class GNG extends AbstractClusterer implements Cloneable {
 		GUnit first,second;
 		GUnit p[] = new GUnit[2];
 		
-		if(S.size() >= 2){		
-			if(distance(this.S.get(0).w, pattern) <= distance(this.S.get(1).w, pattern)){
+		if(S.size() >= 2){
+			double d0 = distanceSquared(this.S.get(0).w, pattern);
+			double d1 = distanceSquared(this.S.get(1).w, pattern);
+			double firstDistSq, secondDistSq;
+			if(d0 <= d1){
 				first = this.S.get(0);
-				second = this.S.get(1);			
+				firstDistSq = d0;
+				second = this.S.get(1);
+				secondDistSq = d1;
 			} else {
 				first = this.S.get(1);
-				second = this.S.get(0);		
-			} 
-			
-			for (int j = 2; j < this.S.size(); j++) {
-				if(distance(this.S.get(j).w, pattern) < distance(first.w, pattern)){
-					second = first;
-					first = this.S.get(j);
-				} else {
-					if(distance(this.S.get(j).w, pattern) < distance(second.w, pattern))
-						second = this.S.get(j);
-				}	
+				firstDistSq = d1;
+				second = this.S.get(0);
+				secondDistSq = d0;
 			}
 			
+			final int size = this.S.size();
+			for (int j = 2; j < size; j++) {
+				GUnit candidate = this.S.get(j);
+				double dSq = distanceSquared(candidate.w, pattern);
+				if(dSq < firstDistSq){
+					second = first;
+					secondDistSq = firstDistSq;
+					first = candidate;
+					firstDistSq = dSq;
+				} else if(dSq < secondDistSq) {
+					second = candidate;
+					secondDistSq = dSq;
+				}
+			}
+			this.lastNearestDist = Math.sqrt(firstDistSq);
 			p[0] = first;
 			p[1] = second;
 			
@@ -361,15 +392,28 @@ public class GNG extends AbstractClusterer implements Cloneable {
 			if(S.size() > 0){
 				p[0] = this.S.get(0);
 				p[1] = this.S.get(0);
+				this.lastNearestDist = distance(p[0].w, pattern);
 			} else return null;
 		}
 		return p;
 	}
 
+	private double distanceSquared(double w1[], double w2[]){
+		if (this.useMahalanobisDistances) {
+			if (this.distScratch == null || this.distScratch.length < w1.length) {
+				this.distScratch = new double[w1.length];
+			}
+			return this.distObj.distanceSquared(w1, w2, this.distScratch);
+		}
+		else return GUnit.distSquared(w1, w2);
+	}
+
 	public double distance(double w1[], double w2[]){
 		if (this.useMahalanobisDistances) {
-			if (this.distObj.getAuxInstance() == null) this.distObj.setAuxInstance(this.auxInst);
-			return this.distObj.distance(w1, w2);
+			if (this.distScratch == null || this.distScratch.length < w1.length) {
+				this.distScratch = new double[w1.length];
+			}
+			return this.distObj.distance(w1, w2, this.distScratch);
 		}
 		else return GUnit.dist(w1, w2);
 	}
