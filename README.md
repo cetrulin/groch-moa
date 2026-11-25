@@ -62,14 +62,12 @@ java -Xmx1024m -cp $EXTRAPATH:$MOA_DEV -javaagent:sizeofag-1.0.0.jar moa.gui.GUI
 
 For documentation about the use of MOA, [visit this link](https://moa.cms.waikato.ac.nz/documentation/). Data is expected to be fed in ARFF format or as a data stream. Different tools like [WEKA](https://www.wikihow.tech/Convert-CSV-to-ARFF), or libraries like [csv2arff](https://pypi.org/project/csv2arff/) can be used to convert tabular data (e.g. CSV files) to this format. 
 
-Experiments in MOA can also be run through bash. We have used bash  in this thesis to automate experiments and run them in parallel. 
+Experiments in MOA can also be run through bash or SLURM using the parameterized runners in `experiments/`:
 
-An example bash script, see `experiments/run_tests_spy2021.sh`. This script receives four arguments:
+* `experiments/run_groch.sh` — runs `meta.GroCH` on any ARFF stream with configurable base learner, drift detector, distance metric, and GroCH flags.
+* `experiments/submit_slurm_groch.sbatch` — portable SLURM job-array wrapper around `run_groch.sh`.
 
-1. Algorithm or experiment name (depending on the test) (e.g. DWM, CPF or NA (== GroCH)).
-2. Sub-experiment name (depending on the first argument, this may second argument may be needed)
-3. Random seed (for non-deterministic algorithms or to identify a different dataset)
-4. Base classifier (e.g. NB or HT)
+*(The original 2021 MOA 2017.06 `meta.NA` thesis sweep scripts are preserved verbatim in tags `v0.1-moa2017.06` and `v1.0.0-moa2017.06`.)*
 
 For in-detail descriptions of the parameters of these algorithms, check the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance**. Appendix A, in this thesis, lists all the paremeters of the MOA code of GroCH. It also lists important parameters and values for this algorithm and its competitors.
 
