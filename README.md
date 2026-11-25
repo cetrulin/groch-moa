@@ -65,6 +65,20 @@ java -cp "$MOA_DEV/lib/*":$MOA_DEV/moa:$MOA_DEV/weka -javaagent:$MOA_DEV/sizeofa
  -f 1500" > $MOA_DEV/logs/test.txt
 ```
 
+## CapyMOA Integration
+
+`capymoa_na.py` provides a lightweight [CapyMOA](https://capymoa.org/) `MOAClassifier` wrapper around `moa.classifiers.meta.NA` for MOA 2024.07. Point `CAPYMOA_MOA_JAR` to your compiled MOA 2024.07 JAR (containing `NA`, `GNG`, `ADDM`, and distance classes) before importing `capymoa`:
+
+```python
+from capymoa.stream import ARFFStream
+from capymoa.evaluation import prequential_evaluation
+from capymoa_na import NA
+
+stream = ARFFStream(path="data.arff")
+learner = NA(schema=stream.get_schema(), CLI="-l (trees.HoeffdingTree) -d (RDDM -o 2.0) -s Euclidean")
+results = prequential_evaluation(stream=stream, learner=learner, max_instances=50000)
+```
+
 ## Data Used In The Scripts
 
 Scripts and instructions to generate the data used in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance** can be found in the GitHub repositories [Quant-Quote-Data-Preprocessing](https://github.com/cetrulin/Quant-Quote-Data-Preprocessing) and [regime-switching-series-generator](https://github.com/cetrulin/regime-switching-series-generator). 
