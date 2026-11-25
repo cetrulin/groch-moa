@@ -20,11 +20,9 @@ In order to run the algorithms contained in the folder `src`, Massive Online Ana
 
 The folder `experiments` contains bash scripts to run a similar parameter optimisation and experiments than the ones performed in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance**. 
 
-These scripts have been tested in both the Windows Linux Subsystem ([WSL](https://docs.microsoft.com/en-us/windows/wsl/install)) in Windows 10 and in the MacOS Catalina terminal using the bash shell. WSL might need of a X11 server to show the graphical interface. [Xming](https://sourceforge.net/projects/xming/) and [XLaunch](https://x.cygwin.com/docs/xlaunch/) are two valid tools for this purpose.
+These scripts and MOA builds are currently tested on **macOS** (Apple Silicon, zsh/bash) and **Linux HPC** environments running **Red Hat Enterprise Linux 9 (RHEL 9 / EL9)** on both login and x86_64 multi-core compute nodes managed by **SLURM**. Legacy experiments were also tested under Windows Subsystem for Linux ([WSL](https://docs.microsoft.com/en-us/windows/wsl/install)) and older macOS bash shells (WSL requires an X11 server such as [Xming](https://sourceforge.net/projects/xming/) or [XLaunch](https://x.cygwin.com/docs/xlaunch/) for the MOA GUI).
 
-The scripts with suffix `_slurm` have been created to trigger experiments in parallel in a SLURM. The version used is:
-
-- SLURM 19.05.1-2
+The scripts with suffix `_slurm` have been created to trigger experiments in parallel on SLURM (originally created on SLURM 19.05.1-2 and currently executed on RHEL 9 SLURM compute nodes).
 
 
 
