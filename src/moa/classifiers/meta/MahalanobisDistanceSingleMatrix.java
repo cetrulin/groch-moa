@@ -234,7 +234,7 @@ public class MahalanobisDistanceSingleMatrix implements ConceptDistance {
      * of the legacy MatrixUtils helper to preserve bit-exact parity without
      * depending on custom classes under {@code weka.core.*}.
      */
-    private static double[][] computePopulationCovariance(double[][] matrix) {
+    static double[][] computePopulationCovariance(double[][] matrix) {
         final int n = matrix.length;
         final int d = matrix[0].length;
         final double[] mean = new double[d];

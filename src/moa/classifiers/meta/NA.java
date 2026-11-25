@@ -46,6 +46,9 @@ import moa.core.Utils;
 import moa.options.ClassOption;
 
 import weka.core.converters.ArffLoader.ArffReader;
+import moa.capabilities.CapabilitiesHandler;
+import moa.capabilities.Capability;
+import moa.capabilities.ImmutableCapabilities;
 import moa.classifiers.AbstractClassifier;
 import moa.classifiers.Classifier;
 import moa.classifiers.MultiClassClassifier;
@@ -92,11 +95,16 @@ import com.yahoo.labs.samoa.instances.WekaToSamoaInstanceConverter;
  * @author Andres L. Suarez-Cetrulo
  * @version $Revision: 2 $
  */
-public class NA extends AbstractClassifier implements MultiClassClassifier {
+public class NA extends AbstractClassifier implements MultiClassClassifier, CapabilitiesHandler {
 
 	@Override
 	public String getPurposeString() {
 		return "NA (GroCH) meta-classifier for recurring concepts using topology-based Concept History (Suarez-Cetrulo et al.).";
+	}
+
+	@Override
+	public ImmutableCapabilities defineImmutableCapabilities() {
+		return new ImmutableCapabilities(Capability.VIEW_STANDARD, Capability.VIEW_LITE);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -363,12 +371,12 @@ public class NA extends AbstractClassifier implements MultiClassClassifier {
 	// All other modules also are orchestrated from here.
 	// -----------------------------------
 	
-	private int cachedByteSize = -1;
-	private long lastByteSizeMeasuredAt = -1;
+	private long cachedByteSize = -1L;
+	private long lastByteSizeMeasuredAt = -1L;
 	private boolean byteSizeDirty = true;
 
 	@Override
-	public int measureByteSize() {
+	public long measureByteSize() {
 		if (this.lastByteSizeMeasuredAt < 0 || this.byteSizeDirty || (this.instancesSeen - this.lastByteSizeMeasuredAt) >= 10000) {
 			this.cachedByteSize = super.measureByteSize();
 			this.lastByteSizeMeasuredAt = this.instancesSeen;
@@ -379,8 +387,8 @@ public class NA extends AbstractClassifier implements MultiClassClassifier {
 
 	@Override
 	public void resetLearningImpl() {
-		this.cachedByteSize = -1;
-		this.lastByteSizeMeasuredAt = -1;
+		this.cachedByteSize = -1L;
+		this.lastByteSizeMeasuredAt = -1L;
 		this.byteSizeDirty = true;
 		
 		// Reset attributes
