@@ -12,6 +12,25 @@ This repository also contains the ADDM drift detector, which consists of two emb
 
 Older versions of GroCH are referred as 'NA'/'NA.java' in the scripts.
 
+## How GroCH Works
+
+GroCH (**Growing Concept History**) handles recurring concept drifts in evolving data streams by pairing an online base classifier and drift detector with **Growing Neural Gas (GNG)** topology summaries stored in a grouped **Concept History (CH)**:
+
+```mermaid
+flowchart TD
+    S["Incoming Stream Instance (x_t, y_t)"] --> P["Predict with Active Classifier"]
+    P --> D["Update Drift Detector (ADDM / RDDM / DDM)"]
+    D -->|"Normal"| N["Train Active Classifier & Update GNG Topology"]
+    D -->|"Warning"| W["Start Warning Window W & Spawn Background Learner"]
+    W --> E["Evaluate Candidate CH Classifiers on W"]
+    D -->|"Drift"| M["Compare W Against CH Group Topologies (ConceptDistance: Mahalanobis / Euclidean)"]
+    M -->|"Group Match (dist < threshold)"| R["Retrieve Best Recurring Classifier vs Background Learner"]
+    M -->|"No Match (New Concept)"| B["Promote Background Learner"]
+    R --> I["Insert Previous Concept & Cloned GNG Topology into CH (FIFO / Least Used eviction)"]
+    B --> I
+    I --> T["Reset Warning Window & Continue Stream"]
+```
+
 
 
 ## Dependencies: 
