@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use GroCH in your research, please cite the Neurocomputing (2026) paper below."
+title: "GroCH (Growing Concept History) for MOA and CapyMOA"
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/cetrulin/groch-moa"
+authors:
+  - family-names: "Suarez-Cetrulo"
+    given-names: "Andres L."
+preferred-citation:
+  type: article
+  title: "A growing concept history of recurring classifiers for high-frequency data streams"
+  authors:
+    - family-names: "Suarez-Cetrulo"
+      given-names: "Andres L."
+  journal: "Neurocomputing"
+  volume: 684
+  pages: "133506"
+  year: 2026
+  doi: "10.1016/j.neucom.2026.133506"
+  url: "https://doi.org/10.1016/j.neucom.2026.133506"

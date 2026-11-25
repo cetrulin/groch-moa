@@ -1,4 +1,7 @@
-# GroCH - MOA Implementation
+# GroCH - MOA & CapyMOA Implementation
+
+[![CI](https://github.com/cetrulin/groch-moa/actions/workflows/ci.yml/badge.svg)](https://github.com/cetrulin/groch-moa/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 This repository contains the implementation of GroCH, iGNGSVM and RCARF, and scripts to run parameter-tuning for the MOA implementation GroCH in an HPC cluster using SLURM. 
 
@@ -103,4 +106,30 @@ print(f"Accuracy: {results.cumulative.accuracy():.2f}%")
 
 ## Data Used In The Scripts
 
-Scripts and instructions to generate the data used in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance** can be found in the GitHub repositories [Quant-Quote-Data-Preprocessing](https://github.com/cetrulin/Quant-Quote-Data-Preprocessing) and [regime-switching-series-generator](https://github.com/cetrulin/regime-switching-series-generator). 
+Scripts and instructions to generate the data used in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance** can be found in the GitHub repositories [Quant-Quote-Data-Preprocessing](https://github.com/cetrulin/Quant-Quote-Data-Preprocessing) and [regime-switching-series-generator](https://github.com/cetrulin/regime-switching-series-generator).
+
+## Versions & Releases
+
+| Tag | Target Framework | Highlights |
+| :--- | :--- | :--- |
+| `v0.1-moa2017.06` | MOA 2017.06 | Original implementation used in the *Neurocomputing* (2026) paper |
+| `v0.5-moa2017.06` | MOA 2017.06 | Pre-optimization baseline with deep `GNG`/`Topology` cloning and Fritzke (1995) edge removal fix |
+| `v1.0.0-moa2017.06` | MOA 2017.06 | Bit-exact Fritzke (1995) performance optimizations, `ConceptDistance`/`DriftEventLogger` refactor, `moa.clusterers.gng`, JUnit tests, Apache 2.0 |
+| `v2.0.0-moa2024.07` | MOA 2024.07 | MOA 2024.07 API (`CapabilitiesHandler`, `long measureByteSize()`), self-contained `PerGroupMahalanobisDistance` & JUnit tests |
+| `v3.0.0-capymoa` | MOA 2024.07 + CapyMOA | Complete `NA` → `GroCH` rename, `scripts/build_moa_jar.sh`, full CapyMOA `GroCH` wrapper & pytest suite |
+
+## Citation
+
+If you use GroCH in your research, please cite:
+
+```bibtex
+@article{suarez2026growing,
+  title   = {A growing concept history of recurring classifiers for high-frequency data streams},
+  author  = {Suarez-Cetrulo, Andres L. and others},
+  journal = {Neurocomputing},
+  volume  = {684},
+  pages   = {133506},
+  year    = {2026},
+  doi     = {10.1016/j.neucom.2026.133506}
+}
+``` 

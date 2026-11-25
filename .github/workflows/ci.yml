@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install CapyMOA and pytest
+        run: |
+          python -m pip install --upgrade pip
+          pip install "capymoa>=0.15.0" pytest
+
+      - name: Build custom MOA 2024.07 fat JAR with GroCH
+        run: |
+          chmod +x scripts/build_moa_jar.sh
+          ./scripts/build_moa_jar.sh ./moa_with_groch.jar python3
+
+      - name: Run CapyMOA pytest suite
+        env:
+          CAPYMOA_MOA_JAR: ${{ github.workspace }}/moa_with_groch.jar
+          PYTHONPATH: ${{ github.workspace }}/capymoa_upstream/src/capymoa/classifier
+        run: |
+          pytest capymoa_upstream/tests/test_groch.py -v

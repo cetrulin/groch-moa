@@ -1,0 +1,29 @@
+# Java build artifacts
+*.class
+*.jar
+target/
+build/
+out/
+
+# Python / pytest / CapyMOA
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+datasets/
+
+# Experiment outputs & logs
+logs/
+*.log
+*_events_log.txt
+
+# OS & IDE files
+.DS_Store
+.idea/
+*.iml
+.classpath
+.project
+.settings/
