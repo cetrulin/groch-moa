@@ -13,10 +13,10 @@ Older versions of GroCH are referred as 'NA'/'NA.java' in the scripts.
 
 ## Dependencies: 
 
-In order to the algorithms contained by the folder `src`, the following versions of Java and Massive Online Analysis (MOA) are needed.
+In order to run the algorithms contained in the folder `src`, Massive Online Analysis (MOA) and Java are needed:
 
-- [MOA version 2017.06](https://sourceforge.net/projects/moa-datastream/files/MOA/2017%20June/moa-release-2017.06b.zip/download) (use the developer version with src code: [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/))
-- Java SE 7.
+- **MOA version 2024.07** *(recommended / current)*: the refactored `NA` (`GroCH` compatibility alias), `moa.clusterers.gng.GNG`, `CapabilitiesHandler`, `long measureByteSize()`, and self-contained `ConceptDistance` strategies (`PerGroupMahalanobisDistance`, `MahalanobisDistanceSingleMatrix`, `EuclideanConceptDistance`) are adapted for and support **MOA 2024.07** (Java 8+).
+- [MOA version 2017.06](https://sourceforge.net/projects/moa-datastream/files/MOA/2017%20June/moa-release-2017.06b.zip/download) *(legacy)*: original thesis experiments used [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/) with Java SE 7 (note that `NA` now targets the MOA 2024.07 `CapabilitiesHandler` and `long measureByteSize()` API).
 
 The folder `experiments` contains bash scripts to run a similar parameter optimisation and experiments than the ones performed in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance**. 
 
@@ -30,7 +30,7 @@ The scripts with suffix `_slurm` have been created to trigger experiments in par
 
 ## Setup Instructions
 
-After downloading MOA and installing Java SE 7, to run the algorithms provided in this repository, uncompress [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/) and move the algorithms contained in the folder `src` of this repository inside. The next step is to compile the `src` files to have relevant `.class` files for all. This can be done by mounting the repository in an IDE such as [Eclipse](https://www.eclipse.org/downloads/). These algorithms have been developed using Eclipse IDE 2018-03. Once the .class files are available, the algorithms of this repository should appear when running MOA through the graphical user interface (GUI) or bash. For this purpose, do not run the moa JAR file since this is a self-contained setup.
+After downloading MOA (2024.07 or legacy 2017.06 sources) and installing a compatible JDK, place the algorithms from `src` (and optionally the JUnit tests from `test`) into your MOA source tree and compile all `.class` files. This can be done by mounting the repository in an IDE such as [Eclipse](https://www.eclipse.org/downloads/). Once the `.class` files are available, the algorithms of this repository (`NA`, `GroCH`, `moa.clusterers.gng.GNG`, `ADDM`, etc.) should appear when running MOA through the graphical user interface (GUI) or bash. For this purpose, do not run the standalone moa JAR file alone since this is a source-integrated setup.
 
 It is recommended to start using MOA's graphical interface, which will show the different parameters supported by the algorithms and different options available to experiment. This can be run with the code below:
 
