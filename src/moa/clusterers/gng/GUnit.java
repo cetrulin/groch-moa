@@ -1,9 +1,11 @@
-package moa.classifiers.igngsvm.gng;
+package moa.clusterers.gng;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class GUnit implements Cloneable {
+public class GUnit implements Cloneable, Serializable {
+	private static final long serialVersionUID = 1L;
 	public double w[];
 	private int label;	
 	private double errorAccum;

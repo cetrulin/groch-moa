@@ -1,6 +1,9 @@
-package moa.classifiers.igngsvm.gng;
+package moa.clusterers.gng;
 
-public class GEdge {
+import java.io.Serializable;
+
+public class GEdge implements Serializable {
+	private static final long serialVersionUID = 1L;
 	public GUnit p0;
 	public GUnit p1;
 	public int age;

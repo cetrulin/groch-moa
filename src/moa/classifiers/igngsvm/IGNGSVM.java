@@ -5,8 +5,8 @@ import java.util.ArrayList;
 
 import moa.classifiers.AbstractClassifier;
 import moa.classifiers.MultiClassClassifier;
-import moa.classifiers.igngsvm.gng.GUnit;
-import moa.classifiers.igngsvm.gng.GNG;
+import moa.clusterers.gng.GUnit;
+import moa.clusterers.gng.GNG;
 
 import com.github.javacliparser.FlagOption;
 import com.github.javacliparser.FloatOption;

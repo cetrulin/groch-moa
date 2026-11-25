@@ -1,6 +1,5 @@
 package moa.classifiers.meta;
 
-import weka.core.MatrixUtils;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -18,7 +17,9 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 
-public class MahalanobisDistanceSingleMatrix {
+public class MahalanobisDistanceSingleMatrix implements ConceptDistance {
+
+    private static final long serialVersionUID = 1L;
     
     /**
         * [Mahalanobis distance]
@@ -70,7 +71,7 @@ public class MahalanobisDistanceSingleMatrix {
     private int dim;
     
     public MahalanobisDistanceSingleMatrix(String [] matrixDatasetsPath) {
-        if(matrixDatasetsPath[0] != "-1") {
+        if(matrixDatasetsPath != null && matrixDatasetsPath.length > 0 && !"-1".equals(matrixDatasetsPath[0])) {
             Instances [] datasets = new Instances[matrixDatasetsPath.length]; 
             Instances mergedDataset = null;
             for (int i = 0; i < datasets.length; i++) datasets[i] = loadDataset(matrixDatasetsPath[i]);
@@ -79,7 +80,7 @@ public class MahalanobisDistanceSingleMatrix {
                 for (int j = 0; j < datasets[i].numInstances() ; j++)  {
                     mergedDataset.add(datasets[i].get(j));
                 }
-            } this.covarMatrix = new Array2DRowRealMatrix(MatrixUtils.calculateCovariance(getFeaturesAsMatrix(mergedDataset)));
+            } this.covarMatrix = new Array2DRowRealMatrix(computePopulationCovariance(getFeaturesAsMatrix(mergedDataset)));
             initPrecomputedMatrix();
             
         } else System.out.println("WARNING! NO DATASETS SPECIFIED TO INITIALIZE THE MAHALANOBIS MATRIX. "
@@ -90,7 +91,7 @@ public class MahalanobisDistanceSingleMatrix {
     public MahalanobisDistanceSingleMatrix(String[] matrixDatasetsPath, Integer[] topologyAttributeSubset) {
         // Constructor in presence of an attribute subset.
         this.attributeSubset = topologyAttributeSubset;
-        if(matrixDatasetsPath[0] != "-1") {
+        if(matrixDatasetsPath != null && matrixDatasetsPath.length > 0 && !"-1".equals(matrixDatasetsPath[0])) {
             Instances [] datasets = new Instances[matrixDatasetsPath.length]; 
             Instances mergedDataset = null;
             for (int i = 0; i < datasets.length; i++) datasets[i] = loadDataset(matrixDatasetsPath[i]);
@@ -103,7 +104,7 @@ public class MahalanobisDistanceSingleMatrix {
             } mergedDataset.setAttributes(this.subsetAttributes);
             mergedDataset.setClassIndex(mergedDataset.get(0).numAttributes() - 1);
             
-            this.covarMatrix = new Array2DRowRealMatrix(MatrixUtils.calculateCovariance(getFeaturesAsMatrix(mergedDataset)));
+            this.covarMatrix = new Array2DRowRealMatrix(computePopulationCovariance(getFeaturesAsMatrix(mergedDataset)));
             initPrecomputedMatrix();
             
         } else System.out.println("WARNING! NO DATASETS SPECIFIED TO INITIALIZE THE MAHALANOBIS MATRIX. "
@@ -136,7 +137,7 @@ public class MahalanobisDistanceSingleMatrix {
                 v_val[j] = inst.classValue();
                 v_att[j] = inst.classAttribute();
             }
-        } inst = new InstanceImpl(1, v_val, v_pos, v_pos.length); // @author: asuarez
+        } inst = new InstanceImpl(1, v_val, v_pos, v_pos.length);
         this.auxInst = inst.copy();
 
         // 2. Modify headers of dataset (TODO: do this only once and send the dataset each time an object is created, or/and to the CH once) 
@@ -214,6 +215,42 @@ public class MahalanobisDistanceSingleMatrix {
     	return this.auxInst = inst.copy();	
     }
     
+    /**
+     * Computes population covariance (1/N) in the exact IEEE-754 operation order
+     * of the legacy MatrixUtils helper to preserve bit-exact parity without
+     * depending on custom classes under {@code weka.core.*}.
+     */
+    private static double[][] computePopulationCovariance(double[][] matrix) {
+        final int n = matrix.length;
+        final int d = matrix[0].length;
+        final double[] mean = new double[d];
+        for (int c = 0; c < d; c++) {
+            double avg = 0.0;
+            for (int r = 0; r < n; r++) {
+                avg += matrix[r][c];
+            }
+            mean[c] = avg / n;
+        }
+        final double[][] centered = new double[n][d];
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < d; c++) {
+                centered[r][c] = matrix[r][c] - mean[c];
+            }
+        }
+        final double[][] cov = new double[d][d];
+        final double invN = 1.0 / n;
+        for (int i = 0; i < d; i++) {
+            for (int j = 0; j < d; j++) {
+                double sum = 0.0;
+                for (int r = 0; r < n; r++) {
+                    sum += centered[r][i] * centered[r][j];
+                }
+                cov[i][j] = sum * invN;
+            }
+        }
+        return cov;
+    }
+
     private void initPrecomputedMatrix() {
         if (this.covarMatrix != null) {
             LUDecomposition lu = new LUDecomposition(this.covarMatrix);
@@ -289,8 +326,22 @@ public class MahalanobisDistanceSingleMatrix {
         return Math.sqrt(sum);
     }
 
+    @Override
     public double distance(Instances a, Instances b) {
         return distance(getFeaturesAsMatrix(a), getFeaturesAsMatrix(b));
+    }
+
+    @Override
+    public double[][] prepareQuery(Instances query) {
+        return getFeaturesAsMatrix(query);
+    }
+
+    @Override
+    public double distance(Instances query, double[][] queryMatrix, Instances target, double[][] targetWeights) {
+        if (queryMatrix != null && targetWeights != null) {
+            return distance(queryMatrix, targetWeights);
+        }
+        return distance(query, target);
     }
 
     public double distance(double[][] aData, double[][] bData) {

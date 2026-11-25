@@ -1,4 +1,19 @@
-package moa.classifiers.igngsvm.gng;
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package moa.clusterers.gng;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -7,8 +22,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import java.util.ArrayList;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import com.yahoo.labs.samoa.instances.Instance;
 import moa.classifiers.meta.MahalanobisDistanceSingleMatrix;
 import moa.cluster.Clustering;
@@ -19,7 +32,32 @@ import com.github.javacliparser.FlagOption;
 import com.github.javacliparser.FloatOption;
 import com.github.javacliparser.IntOption;
 
-
+/**
+ * Growing Neural Gas (GNG) incremental topology-preserving clusterer.
+ *
+ * <p>Implements Bernd Fritzke's (1995) Growing Neural Gas algorithm with
+ * undirected edge aging/removal and support for both Euclidean and
+ * pre-inverted Mahalanobis distances.</p>
+ *
+ * <p>See details in:<br>
+ * Bernd Fritzke. A Growing Neural Gas Network Learns Topologies.
+ * Advances in Neural Information Processing Systems (NIPS), 1995.</p>
+ *
+ * <p>Parameters:</p>
+ * <ul>
+ * <li>-l : Lambda — number of steps between new unit insertions.</li>
+ * <li>-m : Maximum edge age before pruning.</li>
+ * <li>-a : Error reduction factor {@code alpha} on unit insertion.</li>
+ * <li>-d : Global error decay factor per step.</li>
+ * <li>-e : Winner learning rate {@code epsilon_b}.</li>
+ * <li>-n : Neighbor learning rate {@code epsilon_n}.</li>
+ * <li>-c : Maximum number of prototypes to create.</li>
+ * <li>-b : Include class attribute as a feature in the topology.</li>
+ * </ul>
+ *
+ * @author Andres L. Suarez-Cetrulo
+ * @version $Revision: 2 $
+ */
 public class GNG extends AbstractClusterer implements Cloneable {
 
 	private static final long serialVersionUID = -8566293434212159290L;
@@ -74,34 +112,8 @@ public class GNG extends AbstractClusterer implements Cloneable {
 		this.id = (int) (Math.random() * 1000);
 	}
 	
-//	public GNG (IntOption lambdaOption, FloatOption alfaOption, IntOption maxAgeOption, 
-//			FloatOption constantOption, FloatOption BepsilonOption, FloatOption NepsilonOption,
-//			FlagOption classAsAttributeOption) {
-//		this.lambdaOption = lambdaOption;
-//		this.alfaOption = alfaOption;
-//		this.maxAgeOption = maxAgeOption;
-//		this.constantOption = constantOption;
-//		this.BepsilonOption = BepsilonOption;
-//		this.NepsilonOption = NepsilonOption;
-//		this.classAsAttributeOption = classAsAttributeOption;	
-//		this.id = (int) (Math.random() * 1000);
-////		this.stoppingCriteriaOption = stoppingCriteria  // TODO
-////		this.percentualStoppingCriteriaOption = percentualStoppingCriteria;  // TODO
-////		this.quantizationErrAsStoppingCriteriaOption = quantizationErrAsStoppingCriteria;  // TODO
-//	}
-	
 	public ArrayList<GUnit> getS (){
 		return S;	
-	}
-
-	public void log (String st){
-	     try {
-			PrintWriter pw = new PrintWriter(new FileWriter ("gng.log",true));		
-			pw.println(st);
-			pw.flush();
-			pw.close ();
-	     }
-	     catch (Exception e){}
 	}
 
 	@Override
