@@ -15,8 +15,8 @@ Older versions of GroCH are referred as 'NA'/'NA.java' in the scripts.
 
 In order to run the algorithms contained in the folder `src`, Massive Online Analysis (MOA) and Java are needed:
 
-- [**MOA version 2024.07**](https://sourceforge.net/projects/moa-datastream/files/MOA/2024%20July/) *(recommended / current; source code on [Waikato/moa](https://github.com/Waikato/moa))*: the refactored `NA` (`GroCH` compatibility alias), `moa.clusterers.gng.GNG`, `CapabilitiesHandler`, `long measureByteSize()`, and self-contained `ConceptDistance` strategies (`PerGroupMahalanobisDistance`, `MahalanobisDistanceSingleMatrix`, `EuclideanConceptDistance`) are adapted for and support **MOA 2024.07** (Java 8+).
-- [MOA version 2017.06](https://sourceforge.net/projects/moa-datastream/files/MOA/2017%20June/moa-release-2017.06b.zip/download) *(legacy)*: original thesis experiments used [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/) with Java SE 7 (note that `NA` now targets the MOA 2024.07 `CapabilitiesHandler` and `long measureByteSize()` API).
+- [**MOA version 2024.07**](https://sourceforge.net/projects/moa-datastream/files/MOA/2024%20July/) *(recommended / current; source code on [Waikato/moa](https://github.com/Waikato/moa))*: `GroCH` (`moa.classifiers.meta.GroCH`), `GroCHChangeDetector`, `moa.clusterers.gng.GNG`, `CapabilitiesHandler`, `long measureByteSize()`, and self-contained `ConceptDistance` strategies (`PerGroupMahalanobisDistance`, `MahalanobisDistanceSingleMatrix`, `EuclideanConceptDistance`) are adapted for and support **MOA 2024.07** (Java 8+; JDK 21+ when building against CapyMOA's bundled `moa.jar`).
+- [MOA version 2017.06](https://sourceforge.net/projects/moa-datastream/files/MOA/2017%20June/moa-release-2017.06b.zip/download) *(legacy)*: original thesis experiments used [moa-2017.06-sources](https://repo1.maven.org/maven2/nz/ac/waikato/cms/moa/moa/2017.06/) with Java SE 7 (see tags `v0.5-moa2017.06` and `v1.0.0-moa2017.06`).
 
 The folder `experiments` contains bash scripts to run a similar parameter optimisation and experiments than the ones performed in the PhD thesis **Adaptive Algorithms For Classification On High-Frequency Data Streams: Application To Finance**. 
 
@@ -65,18 +65,40 @@ java -cp "$MOA_DEV/lib/*":$MOA_DEV/moa:$MOA_DEV/weka -javaagent:$MOA_DEV/sizeofa
  -f 1500" > $MOA_DEV/logs/test.txt
 ```
 
-## CapyMOA Integration
+## Reproducible CapyMOA Integration
 
-`capymoa_na.py` provides a lightweight [CapyMOA](https://capymoa.org/) `MOAClassifier` wrapper around `moa.classifiers.meta.NA` for MOA 2024.07. Point `CAPYMOA_MOA_JAR` to your compiled MOA 2024.07 JAR (containing `NA`, `GNG`, `ADDM`, and distance classes) before importing `capymoa`:
+This repository includes a full [CapyMOA](https://capymoa.org/) `MOAClassifier` wrapper (`capymoa_upstream/src/capymoa/classifier/_groch.py`), pytest test suite (`capymoa_upstream/tests/test_groch.py`), upstream CapyMOA patches, and a one-command fat-JAR build script (`scripts/build_moa_jar.sh`).
+
+### Quickstart (Local / HPC)
+
+```bash
+# 1. Build a custom CapyMOA fat JAR containing GroCH, GNG, ADDM, and distance strategies (JDK 21+)
+chmod +x scripts/build_moa_jar.sh
+./scripts/build_moa_jar.sh ./moa_with_groch.jar python3
+
+# 2. Point CapyMOA to the custom JAR
+export CAPYMOA_MOA_JAR="$(pwd)/moa_with_groch.jar"
+
+# 3. Run the CapyMOA pytest suite
+PYTHONPATH="$(pwd)/capymoa_upstream/src/capymoa/classifier" pytest capymoa_upstream/tests/test_groch.py -v
+```
+
+### Python Usage
 
 ```python
-from capymoa.stream import ARFFStream
+from capymoa.datasets import ElectricityTiny
 from capymoa.evaluation import prequential_evaluation
-from capymoa_na import NA
+from _groch import GroCH  # or `from capymoa.classifier import GroCH` once integrated into CapyMOA
 
-stream = ARFFStream(path="data.arff")
-learner = NA(schema=stream.get_schema(), CLI="-l (trees.HoeffdingTree) -d (RDDM -o 2.0) -s Euclidean")
-results = prequential_evaluation(stream=stream, learner=learner, max_instances=50000)
+stream = ElectricityTiny()
+learner = GroCH(
+    schema=stream.get_schema(),
+    base_learner="trees.HoeffdingTree",
+    distance_metric="Euclidean",
+    console_log_level=0,
+)
+results = prequential_evaluation(stream=stream, learner=learner, max_instances=1000)
+print(f"Accuracy: {results.cumulative.accuracy():.2f}%")
 ```
 
 ## Data Used In The Scripts

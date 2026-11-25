@@ -1,0 +1,9 @@
+--- a/docs/api/modules/capymoa.classifier.rst
++++ b/docs/api/modules/capymoa.classifier.rst
+@@ -16,6 +16,7 @@ Classifiers
+    EFDT
+    Finetune
++   GroCH
+    HoeffdingAdaptiveTree
+    HoeffdingTree
+    KNN

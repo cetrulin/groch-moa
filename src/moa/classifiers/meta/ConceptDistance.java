@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 /**
  * Strategy interface for computing similarity distances between a query window
- * and stored concept topology prototypes in {@link NA}.
+ * and stored concept topology prototypes in {@link GroCH}.
  */
 public interface ConceptDistance extends Serializable {
 

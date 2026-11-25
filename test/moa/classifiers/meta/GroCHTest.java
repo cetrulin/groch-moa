@@ -24,16 +24,16 @@ import moa.capabilities.ImmutableCapabilities;
 import moa.streams.generators.SEAGenerator;
 
 /**
- * JUnit integration test suite for {@link NA} covering default event-log
+ * JUnit integration test suite for {@link GroCH} covering default event-log
  * suppression, Euclidean and Mahalanobis strategies, and RDDM/ADDM detectors.
  */
-public class NATest extends TestCase {
+public class GroCHTest extends TestCase {
 
-    public NATest(String name) {
+    public GroCHTest(String name) {
         super(name);
     }
 
-    private void runStreamSmoke(NA learner, int numInstances) {
+    private void runStreamSmoke(GroCH learner, int numInstances) {
         SEAGenerator stream = new SEAGenerator();
         stream.prepareForUse();
 
@@ -50,11 +50,11 @@ public class NATest extends TestCase {
     }
 
     public void testDefaultEventLogDisabledAndEuclideanRDDM() {
-        File defaultLog = new File("./NA_events_log.txt");
+        File defaultLog = new File("./GroCH_events_log.txt");
         if (defaultLog.exists()) {
             defaultLog.delete();
         }
-        NA learner = new NA();
+        GroCH learner = new GroCH();
         learner.baseLearnerOption.setValueViaCLIString("trees.HoeffdingTree");
         learner.driftDetectionMethodOption.setValueViaCLIString("RDDM -o 2.0");
         learner.distanceMetricOption.setChosenLabel("Euclidean");
@@ -64,7 +64,7 @@ public class NATest extends TestCase {
     }
 
     public void testADDMDetectorRoute() {
-        NA learner = new NA();
+        GroCH learner = new GroCH();
         learner.baseLearnerOption.setValueViaCLIString("trees.HoeffdingTree");
         learner.driftDetectionMethodOption.setValueViaCLIString("ADDM -a 1.0E-5 -p 1.0E-4");
         learner.distanceMetricOption.setChosenLabel("Euclidean");
@@ -73,7 +73,7 @@ public class NATest extends TestCase {
     }
 
     public void testPerGroupMahalanobisRoute() {
-        NA learner = new NA();
+        GroCH learner = new GroCH();
         learner.baseLearnerOption.setValueViaCLIString("trees.HoeffdingTree");
         learner.driftDetectionMethodOption.setValueViaCLIString("RDDM -o 2.0");
         learner.distanceMetricOption.setChosenLabel("Mahalanobis");
@@ -83,8 +83,8 @@ public class NATest extends TestCase {
     }
 
     public void testCapabilitiesHandlerAndMeasureByteSize() {
-        NA learner = new NA();
-        assertTrue("NA must implement CapabilitiesHandler", learner instanceof CapabilitiesHandler);
+        GroCH learner = new GroCH();
+        assertTrue("GroCH must implement CapabilitiesHandler", learner instanceof CapabilitiesHandler);
         ImmutableCapabilities caps = learner.defineImmutableCapabilities();
         assertNotNull("defineImmutableCapabilities must not return null", caps);
         long size = learner.measureByteSize();
@@ -92,7 +92,7 @@ public class NATest extends TestCase {
     }
 
     public static Test suite() {
-        return new TestSuite(NATest.class);
+        return new TestSuite(GroCHTest.class);
     }
 
     public static void main(String[] args) {
