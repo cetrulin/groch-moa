@@ -67,7 +67,7 @@ import com.yahoo.labs.samoa.instances.Instances;
 import com.yahoo.labs.samoa.instances.WekaToSamoaInstanceConverter;
 
 /**
- * Grouped Concept History (NA / GroCH) meta-classifier for evolving data streams
+ * Growing Concept History (NA / GroCH) meta-classifier for evolving data streams
  * with recurring concepts.
  *
  * <p>Maintains an active base classifier, a background learner trained during
@@ -76,8 +76,9 @@ import com.yahoo.labs.samoa.instances.WekaToSamoaInstanceConverter;
  * {@link ConceptDistance} similarity metric (Mahalanobis or Euclidean).</p>
  *
  * <p>See details in:<br>
- * Andres L. Suarez-Cetrulo et al.
- * Incremental Market Regime Detection and Classification with Recurring Concepts.</p>
+ * Andres L. Suarez-Cetrulo et al. (2026).
+ * A growing concept history of recurring classifiers for high-frequency data streams.
+ * <i>Neurocomputing</i>, 684, 133506. https://doi.org/10.1016/j.neucom.2026.133506</p>
  *
  * <p>Key Parameters:</p>
  * <ul>
@@ -93,7 +94,7 @@ import com.yahoo.labs.samoa.instances.WekaToSamoaInstanceConverter;
  * <p>Note: NA expects structured streams with a fixed attribute schema over time.</p>
  *
  * @author Andres L. Suarez-Cetrulo
- * @version $Revision: 2 $
+ * @version 1.0
  */
 public class NA extends AbstractClassifier implements MultiClassClassifier, CapabilitiesHandler {
 
