@@ -44,7 +44,7 @@ import com.github.javacliparser.IntOption;
  *
  * <p>Parameters:</p>
  * <ul>
- * <li>-l : Lambda — number of steps between new unit insertions.</li>
+ * <li>-l : Lambda, number of steps between new unit insertions.</li>
  * <li>-m : Maximum edge age before pruning.</li>
  * <li>-a : Error reduction factor {@code alpha} on unit insertion.</li>
  * <li>-d : Global error decay factor per step.</li>
